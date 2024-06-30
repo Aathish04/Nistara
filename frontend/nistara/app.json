@@ -22,6 +22,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "92c70a24-fd32-4811-81c8-26546eb2957a"
+      }
+    },
+    "owner": "nistara"
   }
 }
