@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 const SplashScreen = ({ navigation }: {navigation: any}) => {
   return (
-    <LinearGradient style={styles.container} colors={["#95A8EF", "#95A8EF"]}>
+    <LinearGradient style={styles.container} colors={["#f1f3ff", "#95A8EF"]} locations={[0, 0.45]}>
       <Image
         source={require("../assets/splash/logo.jpg")}
       />

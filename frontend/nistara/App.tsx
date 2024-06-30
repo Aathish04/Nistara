@@ -5,8 +5,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons, FontAwesome, SimpleLineIcons } from "@expo/vector-icons";
-import { TouchableOpacity, Text } from 'react-native';
+import { Ionicons,SimpleLineIcons } from "@expo/vector-icons";
+import { TouchableOpacity, Text, View, Image } from 'react-native';
 
 // Splash Screen
 import SplashScreen from './screens/SplashScreen';
@@ -18,12 +18,40 @@ import WarningsScreen from './screens/WarningsScreen';
 import DonateScreen from './screens/DonateScreen';
 import SOSScreen from './screens/SOSScreen';
 
+// User Profile Screens
+import YourProfileScreen from './screens/YourProfileScreen';
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function HomeTabs({navigation}:{navigation:any}){
   return(
   <>
+      <View style={{
+        paddingTop: 60,
+        paddingBottom: 15,
+        paddingHorizontal: 18,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}>
+        <Text style={{fontSize: 22, fontWeight: "400"}}>Nistara</Text>
+        <TouchableOpacity onPress = {()=>{navigation.navigate("Profile")}}>
+          <Image
+            source={require("./assets/profile/dog.png")}
+            style={{
+              width: 35,
+              height: 35,
+              borderRadius: 20,
+            }}
+          />
+        </TouchableOpacity>
+      </View>
+  <View style={{
+        borderWidth: 0.2,
+        borderColor: "#bbb",
+        marginBottom: 15,
+  }}/>
   <Tab.Navigator
     screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
@@ -105,6 +133,11 @@ export default function App() {
           name="SOSScreen"
           component={SOSScreen}
           options={{ headerShown: false}}
+        />
+        <Stack.Screen 
+          name="Profile"
+          component={YourProfileScreen}
+          options= {{ headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>
