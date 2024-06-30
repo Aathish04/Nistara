@@ -34,6 +34,7 @@ function HomeTabs({navigation}:{navigation:any}){
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        backgroundColor: "white"
       }}>
         <Text style={{fontSize: 22, fontWeight: "400"}}>Nistara</Text>
         <TouchableOpacity onPress = {()=>{navigation.navigate("Profile")}}>
@@ -50,7 +51,6 @@ function HomeTabs({navigation}:{navigation:any}){
   <View style={{
         borderWidth: 0.2,
         borderColor: "#bbb",
-        marginBottom: 15,
   }}/>
   <Tab.Navigator
     screenOptions={({ route }) => ({
@@ -94,7 +94,8 @@ function HomeTabs({navigation}:{navigation:any}){
       options={{ headerShown: false }}
     />
   </Tab.Navigator>
-  <TouchableOpacity 
+
+  <TouchableOpacity
         style={{
           position: 'absolute',
           bottom: 45,
@@ -109,7 +110,7 @@ function HomeTabs({navigation}:{navigation:any}){
         }} 
         onPress={() => {navigation.navigate("SOSScreen")}}
   >
-        <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>SOS</Text>
+        <Text style={{ color: 'white', fontSize: 16, fontWeight: '400' }}>SOS</Text>
   </TouchableOpacity>
   </>
   )
