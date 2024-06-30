@@ -2,7 +2,7 @@ import { View, Text, Pressable, Image, StyleSheet, TouchableOpacity} from "react
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 
-const SplashScreen = ({}) => {
+const SplashScreen = ({ navigation }: {navigation: any}) => {
   return (
     <LinearGradient style={styles.container} colors={["#95A8EF", "#95A8EF"]}>
       <Image
@@ -22,6 +22,7 @@ const SplashScreen = ({}) => {
                 ...{ backgroundColor: '#FFFFFF'},
                 ...styles.getStartedButton
             }}
+            onPress = {()=>{navigation.navigate("HomeTabs")}}
             >
 
             <Text style={{ fontSize: 18, ... { color: '#95A8EF' } }}>Get started</Text>
