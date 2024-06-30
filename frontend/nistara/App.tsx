@@ -36,6 +36,7 @@ function HomeTabs({navigation}:{navigation:any}){
         alignItems: "center",
         backgroundColor: "white"
       }}>
+        <Ionicons name='menu' size={24} color = {"black"} />
         <Text style={{fontSize: 22, fontWeight: "400"}}>Nistara</Text>
         <TouchableOpacity onPress = {()=>{navigation.navigate("Profile")}}>
           <Image

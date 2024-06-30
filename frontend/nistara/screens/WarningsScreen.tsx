@@ -16,7 +16,7 @@ const WarningsTopTabs = () =>{
             tabBarLabelStyle: {
               fontSize: 15,
               textTransform: "none",
-              fontWeight: "400",
+              fontWeight: "600",
             },
             tabBarIndicatorStyle: { backgroundColor: "#000", width: "25%", marginLeft: "12%"},
             tabBarPressColor: "#ddd",
