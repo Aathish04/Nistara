@@ -1,9 +1,0 @@
-{
-  "platforms": ["ios", "tvos", "android", "web"],
-  "ios": {
-    "modules": ["NearbyConnectionsExpoModule"]
-  },
-  "android": {
-    "modules": ["expo.modules.nearbyconnectionsexpo.NearbyConnectionsExpoModule"]
-  }
-}
