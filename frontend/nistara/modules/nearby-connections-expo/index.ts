@@ -4,14 +4,14 @@ import { NativeModulesProxy, EventEmitter, Subscription } from 'expo-modules-cor
 // and on native platforms to NearbyConnectionsExpo.ts
 import NearbyConnectionsExpoModule from './src/NearbyConnectionsExpoModule';
 
-// Get the native constant value.
-export const PI = NearbyConnectionsExpoModule.PI;
-
 export function hello(): string {
   return NearbyConnectionsExpoModule.hello();
 }
 
-export async function setValueAsync(value: string) {
-  return await NearbyConnectionsExpoModule.setValueAsync(value);
+export async function requestPermissionsAsync():Promise<any>{
+  return NearbyConnectionsExpoModule.requestPermissionsAsync()
 }
 
+export async function getPermissionsAsync():Promise<any>{
+  return NearbyConnectionsExpoModule.getPermissionsAsync()
+}

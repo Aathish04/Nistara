@@ -1,11 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { hello } from './modules/nearby-connections-expo';
+import React, { useState } from 'react';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import { hello,requestPermissionsAsync} from './modules/nearby-connections-expo';
 export default function App() {
+  let [a,seta] = useState("Hai")
+  async function A(){
+    seta(JSON.stringify((await requestPermissionsAsync())))
+  }
   return (
     <View style={styles.container}>
-      <Text>{hello()}</Text>
+      <Text>{hello()+a}</Text>
+      <Button title="Request Perms" onPress={A}></Button>
       <StatusBar style="auto" />
     </View>
   );

@@ -1,22 +1,14 @@
 package expo.modules.nearbyconnectionsexpo
 
+import android.Manifest
+import expo.modules.kotlin.functions.Coroutine
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import android.util.Log
 
 class NearbyConnectionsExpoModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
   override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('NearbyConnectionsExpo')` in JavaScript.
     Name("NearbyConnectionsExpo")
-
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants(
-      "PI" to Math.PI
-    )
 
     // Defines event names that the module can send to JavaScript.
     Events("onChange")
@@ -26,14 +18,36 @@ class NearbyConnectionsExpoModule : Module() {
       "Hello world! 👋"
     }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
+    AsyncFunction("requestPermissionsAsync") Coroutine { ->
+      val permissionsManager = appContext.permissions ?: throw NoPermissionsModuleException()
+
+      
+      // We aren't using the values returned above, because we need to check if the user has provided fine location permissions
+      return@Coroutine NearbyConnectionsHelpers.askForPermissionsWithPermissionsManager(permissionsManager, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
     }
-    
+
+    AsyncFunction("getPermissionsAsync") Coroutine { ->
+      return@Coroutine getPermissionsAsync()
+    }
   }
+
+  private suspend fun getPermissionsAsync(): PermissionRequestResponse {
+    appContext.permissions?.let {
+      val locationPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_COARSE_LOCATION)
+      val fineLocationPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_FINE_LOCATION)
+      var accuracy = "none"
+      if (locationPermission.granted) {
+        accuracy = "coarse"
+      }
+      if (fineLocationPermission.granted) {
+        accuracy = "fine"
+      }
+
+      locationPermission.android = PermissionDetailsLocationAndroid(
+        accuracy = accuracy
+      )
+      return locationPermission
+    } ?: throw NoPermissionsModuleException()
+  }
+
 }
