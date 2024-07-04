@@ -9,17 +9,17 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "eas-cli": "^10.0.3",
+    "eas-cli": "^10.1.0",
     "expo": "~51.0.17",
+    "expo-dev-client": "~4.0.19",
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
-    "react-native": "0.74.2",
-    "expo-dev-client": "~4.0.19"
+    "react-native": "0.74.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~18.2.45",
-    "typescript": "^5.1.3"
+    "typescript": "~5.3.3"
   },
   "private": true
 }
