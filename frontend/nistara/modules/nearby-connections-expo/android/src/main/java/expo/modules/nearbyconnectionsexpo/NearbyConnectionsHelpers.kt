@@ -65,27 +65,16 @@ internal class PermissionRequestResponse(
   @Field var canAskAgain: Boolean?,
   @Field var expires: String?,
   @Field var granted: Boolean,
-  @Field var status: String?,
-  @Field var android: PermissionDetailsLocationAndroid?
+  @Field var status: String?
 ) : Record, Serializable {
   constructor(bundle: Bundle) : this(
     canAskAgain = bundle.getBoolean("canAskAgain"),
-    expires = bundle.getString("expires")
-      ?: throw ConversionException(Bundle::class.java, PermissionRequestResponse::class.java, "value under `expires` key is undefined"),
+    expires = bundle.getString("expires")?: throw ConversionException(Bundle::class.java, PermissionRequestResponse::class.java, "value under `expires` key is undefined"),
     granted = bundle.getBoolean("granted"),
-    status = bundle.getString("status")
-      ?: throw ConversionException(Bundle::class.java, PermissionRequestResponse::class.java, "value under `status` key is undefined"),
-    android = bundle.getBundle("android")?.let { PermissionDetailsLocationAndroid(it) }
+    status = bundle.getString("status")?: throw ConversionException(Bundle::class.java, PermissionRequestResponse::class.java, "value under `status` key is undefined")
   )
 }
 
-internal class PermissionDetailsLocationAndroid(
-  @Field var accuracy: String
-) : Record, Serializable {
-  constructor(bundle: Bundle) : this(
-    accuracy = (bundle.getString("accuracy") ?: "none")
-  )
-}
 
 internal class NoPermissionsModuleException :
   CodedException("Permissions module is null. Are you sure all the installed Expo modules are properly linked?")

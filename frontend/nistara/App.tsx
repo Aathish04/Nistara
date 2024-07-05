@@ -6,6 +6,7 @@ export default function App() {
   let [a,seta] = useState("Hai")
   async function A(){
     seta(JSON.stringify((await requestPermissionsAsync())))
+    console.log(a)
   }
   return (
     <View style={styles.container}>

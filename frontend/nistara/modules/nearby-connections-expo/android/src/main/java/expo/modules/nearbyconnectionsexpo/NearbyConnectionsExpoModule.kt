@@ -20,10 +20,15 @@ class NearbyConnectionsExpoModule : Module() {
 
     AsyncFunction("requestPermissionsAsync") Coroutine { ->
       val permissionsManager = appContext.permissions ?: throw NoPermissionsModuleException()
+      NearbyConnectionsHelpers.askForPermissionsWithPermissionsManager(
+        permissionsManager,
+        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.BLUETOOTH,Manifest.permission.BLUETOOTH_ADMIN,Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.BLUETOOTH_ADVERTISE,Manifest.permission.BLUETOOTH_CONNECT,
+        Manifest.permission.ACCESS_WIFI_STATE,Manifest.permission.CHANGE_WIFI_STATE,
+        Manifest.permission.NEARBY_WIFI_DEVICES // Only for Tiramisu and after.
+        );
 
-      
-      // We aren't using the values returned above, because we need to check if the user has provided fine location permissions
-      return@Coroutine NearbyConnectionsHelpers.askForPermissionsWithPermissionsManager(permissionsManager, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION);
+      return@Coroutine getPermissionsAsync()
     }
 
     AsyncFunction("getPermissionsAsync") Coroutine { ->
@@ -31,22 +36,31 @@ class NearbyConnectionsExpoModule : Module() {
     }
   }
 
-  private suspend fun getPermissionsAsync(): PermissionRequestResponse {
+  private suspend fun getPermissionsAsync(): Map<String, PermissionRequestResponse> {
     appContext.permissions?.let {
-      val locationPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_COARSE_LOCATION)
+      val coarseLocationPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_COARSE_LOCATION)
       val fineLocationPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_FINE_LOCATION)
-      var accuracy = "none"
-      if (locationPermission.granted) {
-        accuracy = "coarse"
-      }
-      if (fineLocationPermission.granted) {
-        accuracy = "fine"
-      }
+      val bluetoothPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.BLUETOOTH)
+      val bluetoothAdminPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.BLUETOOTH_ADMIN)
+      val bluetoothScanPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.BLUETOOTH_SCAN)
+      val bluetoothAdvertisePermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.BLUETOOTH_ADVERTISE)
+      val bluetoothConnectPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.BLUETOOTH_CONNECT)
+      val accessWifiStatePermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_WIFI_STATE)
+      val changeWifiStatePermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.CHANGE_WIFI_STATE)
+      val nearbyWifiDevicesPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.NEARBY_WIFI_DEVICES)
 
-      locationPermission.android = PermissionDetailsLocationAndroid(
-        accuracy = accuracy
-      )
-      return locationPermission
+      return mapOf(
+            "coarseLocationPermission" to coarseLocationPermission,
+            "fineLocationPermission" to fineLocationPermission,
+            "bluetoothPermission" to bluetoothPermission,
+            "bluetoothAdminPermission" to bluetoothAdminPermission,
+            "bluetoothScanPermission" to bluetoothScanPermission,
+            "bluetoothAdvertisePermission" to bluetoothAdvertisePermission,
+            "bluetoothConnectPermission" to bluetoothConnectPermission,
+            "accessWifiStatePermission" to accessWifiStatePermission,
+            "changeWifiStatePermission" to changeWifiStatePermission,
+            "nearbyWifiDevicesPermission" to nearbyWifiDevicesPermission
+        )
     } ?: throw NoPermissionsModuleException()
   }
 
