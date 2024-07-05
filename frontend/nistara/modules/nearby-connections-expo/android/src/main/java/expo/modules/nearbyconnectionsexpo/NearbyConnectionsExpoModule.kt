@@ -6,7 +6,6 @@ import expo.modules.kotlin.functions.Coroutine
 import expo.modules.kotlin.functions.AsyncFunction
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import expo.modules.kotlin.Promise
 import kotlinx.coroutines.Dispatchers
 import android.util.Log
 
@@ -15,51 +14,29 @@ class NearbyConnectionsExpoModule : Module() {
     Name("NearbyConnectionsExpo")
 
     // Defines event names that the module can send to JavaScript.
-    // Events("onEndpointConnected", "onEndpointLost", "onPayloadReceived")
+    Events("onEndpointConnected", "onEndpointLost", "onPayloadReceived")
 
     // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
     Function("hello") {
       "Hello world! 👋"
     }
 
-    AsyncFunction("startAdvertising") {promise: Promise ->
-      val context = appContext.reactContext ?: run {
-          promise.reject(CodedException("No React context"))
-          return@AsyncFunction
-      }
+    AsyncFunction("startAdvertising") Coroutine { ->
+      val context = appContext.reactContext ?: throw CodedException("No React context")
       val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
-      try {
-        promise.resolve(nearbyConnections.startAdvertising())
-      } catch (e: CodedException) {
-        promise.reject(e)
-      }
+      return@Coroutine nearbyConnections.startAdvertising()
     }
 
-    AsyncFunction("startDiscovery") {promise: Promise ->
-      val context = appContext.reactContext ?: run {
-          promise.reject(CodedException("No React context"))
-          return@AsyncFunction
-      }
+    AsyncFunction("startDiscovery") Coroutine { ->
+      val context = appContext.reactContext ?: throw CodedException("No React context")
       val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
-      try {
-        promise.resolve(nearbyConnections.startDiscovery())
-      } catch (e: CodedException) {
-        promise.reject(e)
-      }
+      return@Coroutine nearbyConnections.startDiscovery()
     }
 
-    AsyncFunction("sendPayload") { endpointId: String, bytes: ByteArray, promise: Promise ->
-      val context = appContext.reactContext ?: run {
-          promise.reject(CodedException("No React context"))
-          return@AsyncFunction
-      }
+    AsyncFunction("sendPayload") Coroutine { endpointId: String, bytes: ByteArray ->
+      val context = appContext.reactContext ?: throw CodedException("No React context")
       val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
-      try {
-        // nearbyConnections.sendPayload(endpointId, bytes)
-        promise.resolve(nearbyConnections.sendPayload(endpointId, bytes))
-      } catch (e: CodedException) {
-        promise.reject(e)
-      }
+      return@Coroutine nearbyConnections.sendPayload(endpointId, bytes)
     }
 
     AsyncFunction("requestPermissionsAsync") Coroutine { ->
