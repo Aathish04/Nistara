@@ -48,5 +48,18 @@ export class dbClient {
     
     return {"message":"Failed Adding Post"}
   }
+
+  async getPosts(){
+    try{
+      let query = "SELECT * FROM main.POSTS;"
+      let result = await this.client.execute(query,{prepare:true})
+      // console.log(result)
+      return {"message":"Post Fetch Successful", "result":result.rows}
+    }
+    catch(e){
+      console.log(e)
+      return {"message":"Failed fetching all posts"}
+    }
+  }
 }
 
