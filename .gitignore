@@ -134,3 +134,4 @@ dist
 NistaraDB-token.json
 secure-connect-nistaradb.zip
 package-lock.json
+env.ts

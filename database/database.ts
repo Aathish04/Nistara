@@ -1,5 +1,10 @@
 import { Client, types } from "cassandra-driver";
 import { sha256 } from 'js-sha256';
+import { Credential } from "./env";
+
+const cred = new Credential();
+const USERNAME :string = cred.username;
+const PASSWORD: string= cred.password;
 
 export class dbClient {
   client: Client = new Client({
@@ -7,8 +12,8 @@ export class dbClient {
       secureConnectBundle: "secure-connect-nistaradb.zip",
     },
     credentials: {
-      username: "ElaDTDRfxOXseDeQUOHjzwxl",
-      password: "TQTnd,Y7AMfWGeOkpmQ-M8ULOgQ_S,JTGpxSxFb+m0,3cxZQT1uTAkh.09msIE1faDZawRsPIYiF8oecAxBEgjImnPQFbafLkQSYUppD_XBglPKoEQN4KXYy22_Rmfpd",
+      username: USERNAME,
+      password: PASSWORD
     },
   });
 
