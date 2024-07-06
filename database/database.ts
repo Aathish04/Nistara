@@ -60,5 +60,42 @@ export class dbClient {
       return {"message":"Failed fetching all posts"}
     }
   }
+
+  async getRequestPosts(){
+    try{
+      let query = "SELECT * FROM main.REQUESTS;"
+      let result = await this.client.execute(query,{prepare:true})
+      return {"message":"Post Fetch Successful", "result":result.rows}
+    }
+    catch(e){
+      console.log(e)
+      return {"message":"Failed fetching all posts"}
+    }
+  }
+
+  async getDonationPosts(){
+    try{
+      let query = "SELECT * FROM main.DONATIONS;"
+      let result = await this.client.execute(query,{prepare:true})
+      return {"message":"Post Fetch Successful", "result":result.rows}
+    }
+    catch(e){
+      console.log(e)
+      return {"message":"Failed fetching all posts"}
+    }
+  }
+
+  async getInformationPosts(){
+    try{
+      let query = "SELECT * FROM main.INFORMATION;"
+      let result = await this.client.execute(query,{prepare:true})
+      return {"message":"Post Fetch Successful", "result":result.rows}
+    }
+    catch(e){
+      console.log(e)
+      return {"message":"Failed fetching all posts"}
+    }
+  }
+
 }
 
