@@ -53,7 +53,6 @@ export class dbClient {
     try{
       let query = "SELECT * FROM main.POSTS;"
       let result = await this.client.execute(query,{prepare:true})
-      // console.log(result)
       return {"message":"Post Fetch Successful", "result":result.rows}
     }
     catch(e){
