@@ -8,6 +8,18 @@ export function hello(): string {
   return NearbyConnectionsExpoModule.hello();
 }
 
+export async function startAdvertising():Promise<any>{
+  return NearbyConnectionsExpoModule.startAdvertising()
+}
+
+export async function startDiscovery():Promise<any>{
+  return NearbyConnectionsExpoModule.startDiscovery()
+}
+
+export async function sendPayload(endpointId:string,bytes:Uint8Array):Promise<any>{
+  return NearbyConnectionsExpoModule.sendPayload(endpointId,bytes)
+}
+
 export async function requestPermissionsAsync():Promise<any>{
   return NearbyConnectionsExpoModule.requestPermissionsAsync()
 }
