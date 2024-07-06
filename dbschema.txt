@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS  main.POSTS
+(postID text,
+ userID int,
+ textualInfo text,
+ multimediaURL list<text>,
+ timestamp timestamp,
+ geoLocation tuple<double,double>,
+ classifier int,
+ isClassified boolean,
+ PRIMARY KEY (postID)
+);
