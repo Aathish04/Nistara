@@ -8,8 +8,12 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import kotlinx.coroutines.Dispatchers
 import android.util.Log
+import kotlinx.coroutines.*
 
 class NearbyConnectionsExpoModule : Module() {
+  private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+  val context = appContext.reactContext ?: throw CodedException("No React context")
+  private val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
   override fun definition() = ModuleDefinition {
     Name("NearbyConnectionsExpo")
 
@@ -22,20 +26,19 @@ class NearbyConnectionsExpoModule : Module() {
     }
 
     AsyncFunction("startAdvertising") Coroutine { ->
-      val context = appContext.reactContext ?: throw CodedException("No React context")
-      val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
-      return@Coroutine nearbyConnections.startAdvertising()
+      return@Coroutine coroutineScope.launch {
+        nearbyConnections.startAdvertising().collect { event -> handleNearbyEvent(event)}
+      }
     }
 
     AsyncFunction("startDiscovery") Coroutine { ->
-      val context = appContext.reactContext ?: throw CodedException("No React context")
-      val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
-      return@Coroutine nearbyConnections.startDiscovery()
+      // Launch a coroutine to collect the flow and send events to JavaScript
+      return@Coroutine coroutineScope.launch {
+        nearbyConnections.startDiscovery().collect { event -> handleNearbyEvent(event)}
+      }
     }
 
     AsyncFunction("sendPayload") Coroutine { endpointId: String, bytes: ByteArray ->
-      val context = appContext.reactContext ?: throw CodedException("No React context")
-      val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
       return@Coroutine nearbyConnections.sendPayload(endpointId, bytes)
     }
 
@@ -85,4 +88,20 @@ class NearbyConnectionsExpoModule : Module() {
     } ?: throw NoPermissionsModuleException()
   }
 
+  private suspend fun handleNearbyEvent(event: NearbyEvent) {
+    when (event) {
+      is NearbyEvent.EndpointConnected -> {
+        sendEvent("onEndpointConnected", mapOf("endpointId" to event.endpointId))
+      }
+      is NearbyEvent.EndpointLost -> {
+        sendEvent("onEndpointLost", mapOf("endpointId" to event.endpointId))
+      }
+      is NearbyEvent.PayloadReceived -> {
+        sendEvent("onPayloadReceived", mapOf(
+          "endpointId" to event.endpointId,
+          "payload" to event.payload // You might need to encode the payload to a suitable format
+        ))
+      }
+    }
+  }
 }
