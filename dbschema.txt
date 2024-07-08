@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS  main.POSTS
 
 CREATE TABLE IF NOT EXISTS main.REQUESTS
 (requestID text,
+ requestType text,
  postID text,
  userID int,
  requiredItem text,
