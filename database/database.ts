@@ -102,5 +102,16 @@ export class dbClient {
     }
   }
 
+  async close(){
+    try{
+      this.client.shutdown();
+      return {"message":"Connection successfully closed"}
+    }
+    catch(e){
+      return {"message":"Connection not closed"}
+    }
+
+  }
+
 }
 
