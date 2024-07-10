@@ -1,8 +1,19 @@
 import { View, Text, Pressable, Image, StyleSheet, TouchableOpacity} from "react-native";
-import React from "react";
+import React, {useEffect} from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import { dbClient } from "../database/database";
 
 const SplashScreen = ({ navigation }: {navigation: any}) => {
+
+  // useEffect(()=>{
+  //   const testDB = async ()=>{
+  //     const client : dbClient = new dbClient();
+  //     const getPostsResponse = await client.getPosts();
+  //     console.log(getPostsResponse.message);
+  //     console.log(getPostsResponse.result)
+  //   }
+  //   testDB()
+  // },[])
   return (
     <LinearGradient style={styles.container} colors={["#f1f3ff", "#95A8EF"]} locations={[0, 0.45]}>
       <Image
