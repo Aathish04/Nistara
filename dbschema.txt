@@ -1,0 +1,64 @@
+CREATE TABLE IF NOT EXISTS  main.POSTS
+(postID text,
+ userID int,
+ textualInfo text,
+ multimediaURL list<text>,
+ timestamp timestamp,
+ geoLocation tuple<double,double>,
+ classifier int,
+ isClassified boolean,
+ PRIMARY KEY (postID)
+);
+
+CREATE TABLE IF NOT EXISTS main.REQUESTS
+(requestID text,
+ requestType text,
+ postID text,
+ userID int,
+ requiredItem text,
+ type text,
+ geoLocation tuple<double,double>,
+ isComplete boolean,
+ PRIMARY KEY (requestID)
+);
+
+CREATE TABLE IF NOT EXISTS main.DONATIONS
+(donationID text,
+ postID text,
+ userID int,
+ donatingItem text,
+ quantity int,
+ geoLocation tuple<double,double>,
+ isComplete boolean,
+ PRIMARY KEY (donationID)
+);
+
+CREATE TABLE IF NOT EXISTS main.INFORMATION
+(postID text,
+ userID int,
+ textualInfo text,
+ multimediaURL list<text>,
+ geoLocation tuple<double,double>,
+ PRIMARY KEY (postID)
+);
+
+
+CREATE TABLE IF NOT EXISTS main.MATCHES
+(requestID text,
+ donationID text,
+ matcherID int,
+ PRIMARY KEY ((requestID,donationID))
+);
+
+CREATE TABLE IF NOT EXISTS main.USERS
+(userID int,
+ userName text,
+ phoneNumber text,
+ address text,
+ geoLocation tuple<double,double>,
+ profileImage text,
+ maskedAadhar text,
+ PRIMARY KEY (userID)
+);
+
+yet to add matcher table

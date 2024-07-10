@@ -13,9 +13,17 @@
     "eas-cli": "^10.1.0",
     "expo": "~51.0.17",
     "expo-dev-client": "~4.0.19",
+    "react-native": "0.74.3",
+    "@react-navigation/bottom-tabs": "^6.5.20",
+    "@react-navigation/material-top-tabs": "^6.6.13",
+    "@react-navigation/native": "^6.1.17",
+    "@react-navigation/native-stack": "^6.9.26",
+    "expo-blur": "^13.0.2",
+    "expo-linear-gradient": "^13.0.2",
+    "expo-location": "^17.0.1",
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
-    "react-native": "0.74.3"
+    "react-native-maps": "^1.15.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
