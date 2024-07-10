@@ -62,8 +62,9 @@ def getUnclassifiedPostInformation():
 def putExtractedInformation(extracted_info, post_data):
     # Extract information from parameters
     category = str(extracted_info['category'])
-    userid = str(post_data['userid'])
-    items =  json.dumps(extracted_info['items'], indent=2)
+    userid = int(post_data['userid'])
+    #items =  json.dumps(extracted_info['items'], indent=2)
+
     postid = str(post_data['postid'])
     isComplete = False
 
@@ -73,7 +74,33 @@ def putExtractedInformation(extracted_info, post_data):
     result = hashlib.sha256(combined_str)
     __id = result.hexdigest()
 
-    print(items)
+    print(extracted_info)
+    print(post_data)
+
+
+    if category == 'OFFER':
+        for item in extracted_info['items']:
+            combined_per_item = {**post_data, **item}
+            combined_per_item_str = str(combined_per_item).encode()
+            result = hashlib.sha256(combined_per_item_str)
+            donationid = result.hexdigest()
+
+            item_name = item['itemName']
+            quantity = item['quantity']
+
+            prepared = session.prepare("INSERT INTO main.donations (donationid, donatingitem, geolocation,iscomplete,postid,quantity,userid) VALUES (?, ?, ?, ?, ?, ?, ?);")
+            session.execute(prepared, (str(donationid), item_name,post_data['geolocation'],False,postid,quantity,userid))
+            print("Item name ",item_name, "Quantity ",quantity )
+
+
+        isClassified = True
+        update_query = f"UPDATE main.posts SET isclassified = {isClassified}, classifier = 1 WHERE postid = '{postid}';"
+        session.execute(update_query)
+    
+
+
+
+
 
     # if extracted_info['category'] == 'REQUEST_FIRST_AID' or extracted_info['category'] == 'REQUEST_ITEM' or extracted_info['category'] == 'REQUEST_EVACUATION' or extracted_info['category'] == 'REQUEST_SEARCH':
 

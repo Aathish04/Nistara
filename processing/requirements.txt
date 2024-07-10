@@ -1,7 +1,10 @@
 annotated-types==0.7.0
 cachetools==5.3.3
+cassandra-driver==3.29.1
 certifi==2024.7.4
 charset-normalizer==3.3.2
+click==8.1.7
+geomet==0.2.1.post1
 google-ai-generativelanguage==0.6.6
 google-api-core==2.19.1
 google-api-python-client==2.136.0
@@ -22,6 +25,7 @@ pydantic_core==2.20.1
 pyparsing==3.1.2
 requests==2.32.3
 rsa==4.9
+six==1.16.0
 tqdm==4.66.4
 typing_extensions==4.12.2
 uritemplate==4.1.1

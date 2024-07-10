@@ -7,13 +7,13 @@ import time
 from database import getUnclassifiedPostInformation, putExtractedInformation
 # Or use `os.getenv('GOOGLE_API_KEY')` to fetch an environment variable.
 
-genai.configure(api_key=GOOGLE_API_KEY)
+
 
 with open("NistaraDB-token.json") as f:
     secrets = json.load(f)
 
 GOOGLE_API_KEY = secrets["google_api_key"]
-
+genai.configure(api_key=GOOGLE_API_KEY)
 
 post_schema = glm.Schema(
     type=glm.Type.OBJECT,
@@ -91,13 +91,19 @@ if __name__ == "__main__":
 #     "geoLocation": "(40.712776, -74.005974)"
 # }
     # print(extract_event_data_from_post(post))
-    while True:
-        post = getUnclassifiedPostInformation()
-        print(post)
-        if post:
+
+
+    # while True:
+    #     post = getUnclassifiedPostInformation()
+    #     print(post)
+    #     if post:
             
-            extracted = extract_event_data_from_post(post)
-            print(extracted)
-            putExtractedInformation(extracted,post)
-            time.sleep(3)
-    
+    #         extracted = extract_event_data_from_post(post)
+    #         print(extracted)
+    #         putExtractedInformation(extracted,post)
+    #         time.sleep(3)
+
+    post = getUnclassifiedPostInformation()
+    extracted = extract_event_data_from_post(post)
+    print(extracted)
+    putExtractedInformation(extracted,post)
