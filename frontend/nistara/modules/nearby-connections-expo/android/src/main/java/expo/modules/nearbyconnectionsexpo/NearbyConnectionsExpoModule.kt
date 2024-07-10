@@ -1,5 +1,6 @@
 package expo.modules.nearbyconnectionsexpo
 
+import android.content.Context
 import android.Manifest
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.functions.Coroutine
@@ -12,8 +13,8 @@ import kotlinx.coroutines.*
 
 class NearbyConnectionsExpoModule : Module() {
   private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-  val context = appContext.reactContext ?: throw CodedException("No React context")
-  private val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
+  // val context = appContext.reactContext ?: throw CodedException("No React context")
+  val context:Context get() = appContext.reactContext ?: throw CodedException("No React context")
   override fun definition() = ModuleDefinition {
     Name("NearbyConnectionsExpo")
 
@@ -21,32 +22,38 @@ class NearbyConnectionsExpoModule : Module() {
     Events("onEndpointConnected", "onEndpointLost", "onPayloadReceived")
 
     // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
+    Function("sanitycheck") {
+      "Can Make Native Calls!"
     }
 
     AsyncFunction("startAdvertising") Coroutine { ->
-      return@Coroutine coroutineScope.launch {
+      val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
+      val startAdvertisingJob = coroutineScope.launch {
         nearbyConnections.startAdvertising().collect { event -> handleNearbyEvent(event)}
       }
+      return@Coroutine startAdvertisingJob.isActive
     }
 
     AsyncFunction("startDiscovery") Coroutine { ->
+      val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
       // Launch a coroutine to collect the flow and send events to JavaScript
-      return@Coroutine coroutineScope.launch {
+      val startDiscoveryJob = coroutineScope.launch {
         nearbyConnections.startDiscovery().collect { event -> handleNearbyEvent(event)}
       }
+      return@Coroutine startDiscoveryJob.isActive
     }
 
     AsyncFunction("sendPayload") Coroutine { endpointId: String, bytes: ByteArray ->
+      val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
       return@Coroutine nearbyConnections.sendPayload(endpointId, bytes)
     }
 
     AsyncFunction("requestPermissionsAsync") Coroutine { ->
       val permissionsManager = appContext.permissions ?: throw NoPermissionsModuleException()
+      NearbyConnectionsHelpers.askForPermissionsWithPermissionsManager(permissionsManager,Manifest.permission.ACCESS_COARSE_LOCATION)
       NearbyConnectionsHelpers.askForPermissionsWithPermissionsManager(
         permissionsManager,
-        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.BLUETOOTH,Manifest.permission.BLUETOOTH_ADMIN,Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.BLUETOOTH_ADVERTISE,Manifest.permission.BLUETOOTH_CONNECT,
         Manifest.permission.ACCESS_WIFI_STATE,Manifest.permission.CHANGE_WIFI_STATE,
         Manifest.permission.NEARBY_WIFI_DEVICES // Only for Tiramisu and after.
