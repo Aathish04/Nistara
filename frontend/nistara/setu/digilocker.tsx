@@ -32,4 +32,26 @@ export class setuClient {
             return {message: "Failed to retrieve Digilocker Request Id"}
         }
     }
+
+    async getDigilockerRequestStatus(reqId: string){
+        try{
+            const response = await axios.get(`${this.baseUrl}/api/digilocker/${reqId}/status`, {headers: this.headers})
+            console.log(response.data)
+            return response.data
+        }catch(e){
+            console.error(e)
+            return { message: "Request status could not be retrieved" }
+        }
+    }
+
+    async getAadhaar(reqId: string){
+        try{
+            const response = await axios.get(`${this.baseUrl}/api/digilocker/${reqId}/aadhaar`, { headers: this.headers });
+            // console.log(response.data.aadhaar)
+            return response.data.aadhaar
+        }catch(e){
+            console.error(e)
+            return { message: "e-Aadhar XML retrieved successfully" }
+        }
+    }
 }

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { StyleSheet, Text, View, Button, Linking, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Button, Linking, TouchableOpacity, Alert } from 'react-native';
 import {Ionicons} from '@expo/vector-icons'
 import { setuClient } from '../setu/digilocker';
 
@@ -15,16 +15,48 @@ const AadharOnboarding = ({navigation}: {navigation: any}) =>{
     const client: setuClient = new setuClient()
 
     const [digilockerReq, setDigilockerReq] = useState<DigilockerRequest | null>(null)
+    const [authComplete, setAuthComplete] = useState<boolean>(false)
+    const [aadhaarInfo, setAadharInfo] = useState<any>(null)
 
     const getDigilockerRequest = async() =>{
         const response = await client.getDigilockerRequest()
+        console.log("here2", response)
         setDigilockerReq(response)
     }
 
-    const handlePress = () =>{
-        getDigilockerRequest()
-        if(digilockerReq) Linking.openURL(digilockerReq.url).catch(err => console.error("Couldn't load page", err));
+    const handlePress = async () =>{
+        // await getDigilockerRequest()
+        const response = await client.getDigilockerRequest()
+        console.log("here2", response)
+        setDigilockerReq(response)
+        if(response){
+            console.log("here", digilockerReq)
+            Linking.openURL(response.url).catch(err => console.error("Couldn't load page", err));
+        }
     }
+
+    useEffect(()=>{
+        const checkDigilockerReqStatus=async()=>{
+            if(digilockerReq){
+                const response = await client.getDigilockerRequestStatus(digilockerReq.id)
+                if(response.status==="authenticated"){
+                    setAuthComplete(true)
+                    const aadhaarResponse = await client.getAadhaar(digilockerReq.id)
+                    Alert.alert(
+                        "Success",
+                        "Aadhaar verification successful",
+                        [
+                          {
+                            text: "OK",
+                            onPress: () => navigation.navigate('SignUp', { aadhaarInfo: aadhaarResponse })
+                          }
+                        ]
+                      );
+                }
+            }
+        }
+        checkDigilockerReqStatus()
+    })
 
     return (
         <View style={styles.container}>
@@ -59,7 +91,7 @@ const AadharOnboarding = ({navigation}: {navigation: any}) =>{
                 ...styles.button,
                 ...{ backgroundColor: '#95A8EF'},
             }}
-            onPress = {()=>{handlePress()}}
+            onPress = {handlePress}
             >
             <Text style={{ fontSize: 18, ... { color: '#FFFFFF' } }}>Verify now</Text>
         </TouchableOpacity>
@@ -99,11 +131,11 @@ const styles = StyleSheet.create({
       bulletBox: {
         position: 'absolute',
         top: 2,
-        left: 20, // Position the bullet box closer to the edge
-        width: 8, // Width of the bullet box
-        height: 8, // Height of the bullet box
+        left: 20, 
+        width: 8, 
+        height: 8, 
         backgroundColor: '#000',
-        marginTop: 10, // Aligns with the title
+        marginTop: 10, 
       },
       titleText: {
         fontSize: 18,

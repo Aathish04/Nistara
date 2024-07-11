@@ -13,6 +13,7 @@ import SplashScreen from './screens/SplashScreen';
 
 // Authentication Screens
 import AadharOnboarding from './screens/AadharOnboarding';
+import SignUpScreen from './screens/SignUpScreen';
 
 // Home Bottom Nav Tabs
 import HomeScreen from './screens/HomeScreen';
@@ -35,6 +36,7 @@ function AuthStack(){
       }}
       >
         <Stack.Screen name = "AadharOnboarding" component={AadharOnboarding} />
+        <Stack.Screen name = "SignUp" component = {SignUpScreen} />
 
     </Stack.Navigator>
   )
