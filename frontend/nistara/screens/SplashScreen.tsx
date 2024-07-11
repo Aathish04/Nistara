@@ -8,12 +8,13 @@ const SplashScreen = ({ navigation }: {navigation: any}) => {
   // useEffect(()=>{
   //   const testDB = async ()=>{
   //     const client : dbClient = new dbClient();
-  //     const getPostsResponse = await client.getPosts();
+  //     const getPostsResponse = await client.addPost(1,"trial",[],1720263740389,[0,0]);
   //     console.log(getPostsResponse.message);
-  //     console.log(getPostsResponse.result)
   //   }
   //   testDB()
   // },[])
+
+
   return (
     <LinearGradient style={styles.container} colors={["#f1f3ff", "#95A8EF"]} locations={[0, 0.45]}>
       <Image
@@ -33,9 +34,8 @@ const SplashScreen = ({ navigation }: {navigation: any}) => {
                 ...{ backgroundColor: '#FFFFFF'},
                 ...styles.getStartedButton
             }}
-            onPress = {()=>{navigation.navigate("HomeTabs")}}
+            onPress = {()=>{navigation.navigate("Auth", {screen: "AadharOnboarding"})}}
             >
-
             <Text style={{ fontSize: 18, ... { color: '#95A8EF' } }}>Get started</Text>
         </TouchableOpacity>
     </LinearGradient>

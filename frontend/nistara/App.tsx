@@ -11,6 +11,9 @@ import { TouchableOpacity, Text, View, Image } from 'react-native';
 // Splash Screen
 import SplashScreen from './screens/SplashScreen';
 
+// Authentication Screens
+import AadharOnboarding from './screens/AadharOnboarding';
+
 // Home Bottom Nav Tabs
 import HomeScreen from './screens/HomeScreen';
 import SearchScreen from './screens/SearchScreen';
@@ -24,6 +27,19 @@ import YourProfileScreen from './screens/YourProfileScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+function AuthStack(){
+  return(
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false
+      }}
+      >
+        <Stack.Screen name = "AadharOnboarding" component={AadharOnboarding} />
+
+    </Stack.Navigator>
+  )
+}
+
 function HomeTabs({navigation}:{navigation:any}){
   return(
   <>
@@ -36,8 +52,8 @@ function HomeTabs({navigation}:{navigation:any}){
         alignItems: "center",
         backgroundColor: "white"
       }}>
-        <Ionicons name='menu' size={24} color = {"black"} />
-        <Text style={{fontSize: 22, fontWeight: "400"}}>Nistara</Text>
+        {/* <Ionicons name='menu' size={24} color = {"black"} /> */}
+        <Text style={{fontSize: 22, fontWeight: "500"}}>Nistara</Text>
         <TouchableOpacity onPress = {()=>{navigation.navigate("Profile")}}>
           <Image
             source={require("./assets/profile/dog.png")}
@@ -125,6 +141,11 @@ export default function App() {
           name="SplashScreen"
           component={SplashScreen}
           options = {{headerShown: false}}
+        />
+        <Stack.Screen
+            name="Auth"
+            component={AuthStack}
+            options={{ headerShown: false }}
         />
         <Stack.Screen
           name="HomeTabs"

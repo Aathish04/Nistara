@@ -91,10 +91,23 @@ const WarningsAlertsScreen: React.FC = () => {
         initialRegion={{
           latitude: userLocation?.coords.latitude || 20.5937,
           longitude: userLocation?.coords.longitude || 78.9629,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
+          latitudeDelta: 15,
+          longitudeDelta: 15,
         }}
       >
+
+      {userLocation && (
+          <Marker
+            coordinate={{
+              latitude: userLocation.coords.latitude,
+              longitude: userLocation.coords.longitude,
+            }}
+            title="Your Location"
+            pinColor="blue"
+          />
+        )}
+
+
         {alerts.map((alert) => {
           const [longitude, latitude] = alert.centroid.split(',').map(Number);
           return (
