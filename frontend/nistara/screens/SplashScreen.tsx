@@ -32,11 +32,11 @@ const SplashScreen = ({ navigation }: {navigation: any}) => {
             style={{
                 ...styles.button,
                 ...{ backgroundColor: '#FFFFFF'},
-                ...styles.getStartedButton
+                ...styles.howItWorksButton
             }}
-            onPress = {()=>{navigation.navigate("Auth", {screen: "AadharOnboarding"})}}
+            onPress = {()=>{navigation.navigate("Auth", {screen: "OnboardingInit"})}}
             >
-            <Text style={{ fontSize: 18, ... { color: '#95A8EF' } }}>Get started</Text>
+            <Text style={{ fontSize: 18, ... { color: '#95A8EF' } }}>Learn how it works</Text>
         </TouchableOpacity>
     </LinearGradient>
   );
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "center",
   },
-  getStartedButton: {
+  howItWorksButton: {
     width: "95%",
     marginTop: 140,
   },

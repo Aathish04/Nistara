@@ -1,62 +1,53 @@
-import React, {useState, useEffect} from 'react';
-import { StyleSheet, Text, View, Button, Linking, TouchableOpacity, Alert } from 'react-native';
+import React, {useState} from 'react';
+import { StyleSheet, Text, View, Linking, TouchableOpacity, Alert } from 'react-native';
 import {Ionicons} from '@expo/vector-icons'
 import { setuClient } from '../setu/digilocker';
+import { useFocusEffect } from '@react-navigation/native';
 
-interface DigilockerRequest {
-    id: string,
-    status: string,
-    url: string,
-    validUpto: string,
-    traceId: string
-}
 
-const AadharOnboarding = ({navigation}: {navigation: any}) =>{
+const AadhaarOnboarding = ({route, navigation}: {route:any, navigation: any}) =>{
+
     const client: setuClient = new setuClient()
-
-    const [digilockerReq, setDigilockerReq] = useState<DigilockerRequest | null>(null)
-    const [authComplete, setAuthComplete] = useState<boolean>(false)
+    const { digilockerReq } = route.params
+    const [digilockerReqStatus, setDigilockerReqStatus] = useState<any>(null)
     const [aadhaarInfo, setAadharInfo] = useState<any>(null)
 
-    const getDigilockerRequest = async() =>{
-        const response = await client.getDigilockerRequest()
-        console.log("here2", response)
-        setDigilockerReq(response)
-    }
-
-    const handlePress = async () =>{
-        // await getDigilockerRequest()
-        const response = await client.getDigilockerRequest()
-        console.log("here2", response)
-        setDigilockerReq(response)
-        if(response){
-            console.log("here", digilockerReq)
-            Linking.openURL(response.url).catch(err => console.error("Couldn't load page", err));
+   
+    const handlePress =()=>{
+        if(digilockerReq){
+          Linking.openURL(digilockerReq.url).catch(err => console.error("Couldn't load page", err));
         }
-    }
+      }
 
-    useEffect(()=>{
+    useFocusEffect(
+      React.useCallback(()=>{
+        let isActive = true
         const checkDigilockerReqStatus=async()=>{
-            if(digilockerReq){
+            console.log(isActive)
+            if(digilockerReq && isActive){
                 const response = await client.getDigilockerRequestStatus(digilockerReq.id)
+                setDigilockerReqStatus(response)
                 if(response.status==="authenticated"){
-                    setAuthComplete(true)
                     const aadhaarResponse = await client.getAadhaar(digilockerReq.id)
+                    setAadharInfo(aadhaarInfo)
                     Alert.alert(
                         "Success",
                         "Aadhaar verification successful",
                         [
                           {
                             text: "OK",
-                            onPress: () => navigation.navigate('SignUp', { aadhaarInfo: aadhaarResponse })
+                            onPress: () => navigation.navigate('SignUp', { aadhaarInfo: aadhaarResponse, email: response.email, phone: response.phone })
                           }
                         ]
                       );
-                }
+                  }
             }
         }
         checkDigilockerReqStatus()
-    })
+        return () => {
+          isActive = false;
+        }
+      }, [digilockerReqStatus]))
 
     return (
         <View style={styles.container}>
@@ -165,4 +156,4 @@ const styles = StyleSheet.create({
       
   });
 
-export default AadharOnboarding;
+export default AadhaarOnboarding;

@@ -12,7 +12,8 @@ import { TouchableOpacity, Text, View, Image } from 'react-native';
 import SplashScreen from './screens/SplashScreen';
 
 // Authentication Screens
-import AadharOnboarding from './screens/AadharOnboarding';
+import OnboardingInit from './screens/Onboarding';
+import AadhaarOnboarding from './screens/AadhaarAuth';
 import SignUpScreen from './screens/SignUpScreen';
 
 // Home Bottom Nav Tabs
@@ -35,7 +36,8 @@ function AuthStack(){
         headerShown: false
       }}
       >
-        <Stack.Screen name = "AadharOnboarding" component={AadharOnboarding} />
+        <Stack.Screen name = "OnboardingInit" component = {OnboardingInit} />
+        <Stack.Screen name = "AadhaarOnboarding" component={AadhaarOnboarding} />
         <Stack.Screen name = "SignUp" component = {SignUpScreen} />
 
     </Stack.Navigator>
