@@ -36,18 +36,23 @@ const AadhaarOnboarding = ({route, navigation}: {route:any, navigation: any}) =>
                         [
                           {
                             text: "OK",
-                            onPress: () => navigation.navigate('SignUp', { aadhaarInfo: aadhaarResponse, email: response.email, phone: response.phone })
+                            onPress: () => navigation.navigate('SignUp', { aadhaarInfo: aadhaarResponse, email: response.digilockerUserDetails.email, phone: response.digilockerUserDetails.phoneNumber })
                           }
                         ]
                       );
                   }
             }
         }
-        checkDigilockerReqStatus()
+        const intervalId = setInterval(() => {
+          checkDigilockerReqStatus();
+        }, 5000);
+  
         return () => {
           isActive = false;
-        }
-      }, [digilockerReqStatus]))
+          clearInterval(intervalId);
+        };
+
+      }, [digilockerReq, digilockerReqStatus]))
 
     return (
         <View style={styles.container}>

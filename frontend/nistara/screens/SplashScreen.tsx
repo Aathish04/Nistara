@@ -34,7 +34,7 @@ const SplashScreen = ({ navigation }: {navigation: any}) => {
                 ...{ backgroundColor: '#FFFFFF'},
                 ...styles.howItWorksButton
             }}
-            onPress = {()=>{navigation.navigate("Auth", {screen: "OnboardingInit"})}}
+            onPress = {()=>{navigation.navigate("HomeTabs")}}
             >
             <Text style={{ fontSize: 18, ... { color: '#95A8EF' } }}>Learn how it works</Text>
         </TouchableOpacity>

@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingHorizontal: 20,
         position: 'relative',
-        paddingLeft: 40, // Adjusted to accommodate the bullet box
+        paddingLeft: 40, 
       },
       bulletBox: {
         position: 'absolute',
