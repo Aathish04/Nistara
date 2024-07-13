@@ -34,7 +34,9 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-
-NistaraDB-token.json
+.gradle/
+.idea/
 env.tsx
 data.tsx
+NistaraDB-token.json
+env.tsx

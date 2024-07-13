@@ -129,9 +129,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 .DS_Store
-
-.venv
-NistaraDB-token.json
-secure-connect-nistaradb.zip
-package-lock.json
-env.ts
+.vscode
