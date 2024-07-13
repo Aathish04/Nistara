@@ -4,12 +4,29 @@ import { Button, StyleSheet, Text, View } from 'react-native';
 import { startAdvertising, startDiscovery, sanitycheck,requestPermissionsAsync, addOnEndpointConnectedListener, addOnEndpointLostListener} from './modules/nearby-connections-expo';
 export default function App() {
   let [perms,setPerms] = useState("No Perms Yet")
+  let [conns, setConns] = useState<Array<string>>([]);
   async function requestPerms(){
     setPerms(JSON.stringify(await requestPermissionsAsync()))
   }
 
-  addOnEndpointConnectedListener((event)=>{console.log("Endpoint Found:"+JSON.stringify(event))})
-  addOnEndpointLostListener((event)=>{console.log("Endpoint Lost: "+JSON.stringify(event))})
+  addOnEndpointConnectedListener(
+  (event) => {
+    console.log("Endpoint Found:" + JSON.stringify(event));
+    let oldConns = [...conns];
+    oldConns.push(event.endpointId)
+    oldConns = [...new Set(oldConns)];
+    setConns(oldConns)
+  });
+
+  addOnEndpointLostListener(
+    (event)=>{
+      console.log("Endpoint Lost: "+JSON.stringify(event))
+      let oldConns = new Set(conns)
+      oldConns.delete(event.endpointId);
+      setConns([...oldConns]);
+    }
+  )
+  
   return (
     <View style={styles.container}>
       <Text>{sanitycheck()}</Text>
@@ -17,6 +34,7 @@ export default function App() {
       <Button title="Request Perms" onPress={requestPerms}></Button>
       <Button title="Start Advertising" onPress={startAdvertising}></Button>
       <Button title="Start Discovery" onPress={startDiscovery}></Button>
+      <Text id='Connections'>Connections: {JSON.stringify(conns)}</Text>
       <StatusBar style="auto" />
     </View>
   );
