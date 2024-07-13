@@ -36,3 +36,6 @@ yarn-error.*
 
 .gradle/
 .idea/
+
+NistaraDB-token.json
+env.tsx
