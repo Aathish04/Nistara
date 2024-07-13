@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   howItWorksButton: {
     width: "95%",
-    marginTop: 140,
+    // marginTop: 140, // Aathish says Hi
   },
   button: {
     paddingBottom: 14,
