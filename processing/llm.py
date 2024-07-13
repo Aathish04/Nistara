@@ -1,3 +1,4 @@
+from logging import getLogger, basicConfig, INFO
 from os import environ
 import google.generativeai as genai
 import google.ai.generativelanguage as glm
@@ -6,13 +7,16 @@ import requests
 import json
 import time
 from database import getUnclassifiedPostInformation, putExtractedInformation, insertData
-# Or use `os.getenv('GOOGLE_API_KEY')` to fetch an environment variable.
-
 from dotenv import load_dotenv
+
+logger = getLogger(__name__)
+
 load_dotenv()
 
-GEMINI_API_KEY = environ.get("GEMINI_API_KEY","No-Key")
+GEMINI_API_KEY = environ.get("GEMINI_API_KEY", "No-Key")
 genai.configure(api_key=GEMINI_API_KEY)
+
+logger.info("Configured Google Generative AI with provided API key.")
 
 post_schema = glm.Schema(
     type=glm.Type.OBJECT,
@@ -24,16 +28,22 @@ post_schema = glm.Schema(
                 properties={
                     "itemName": glm.Schema(type=glm.Type.STRING),
                     "quantity": glm.Schema(type=glm.Type.INTEGER),
-                    "class" :   glm.Schema(type=glm.Type.STRING,enum=["FOOD_AND_WATER","EMERGENCY_LIGHTING_AND_COMMUNICATION","HEALTH_AND_HYGIENE","TOOLS_AND_EQUIPMENT","ENTERTAINMENT","CLOTHING_AND_SHELTER","SAFETY_AND_PROTECTION"],format="enum")
+                    "class": glm.Schema(
+                        type=glm.Type.STRING,
+                        enum=["FOOD_AND_WATER", "EMERGENCY_LIGHTING_AND_COMMUNICATION", "HEALTH_AND_HYGIENE", "TOOLS_AND_EQUIPMENT", "ENTERTAINMENT", "CLOTHING_AND_SHELTER", "SAFETY_AND_PROTECTION"],
+                        format="enum"
+                    )
                 }
             )
         ),
-        "category": glm.Schema(type=glm.Type.STRING,enum=["REQUEST_ITEM","REQUEST_EVACUATION","REQUEST_SEARCH","OFFER","INFORMATION"],format="enum"),
-       
+        "category": glm.Schema(
+            type=glm.Type.STRING,
+            enum=["REQUEST_ITEM", "REQUEST_EVACUATION", "REQUEST_SEARCH", "OFFER", "INFORMATION"],
+            format="enum"
+        ),
     },
     description="Information to be extracted from post"
 )
-
 
 get_info = glm.FunctionDeclaration(
     name="get_info",
@@ -47,21 +57,23 @@ get_info = glm.FunctionDeclaration(
 )
 
 model = genai.GenerativeModel(model_name='models/gemini-1.5-flash-latest')
-
+logger.info("Initialized GenerativeModel with gemini-1.5-flash-latest.")
 
 def flatten_post_contents_for_gemini(prompt, post):
     contents = [prompt]
-    # Ensure the multimediaURL key exists before iterating
     if "multimediaURL" in post:
         for image in post["multimediaURL"]:
-            contents.append(
-                {
-                    "data": requests.get(image["url"]).content,
-                    "mime_type": image["mimetype"]
-                }
-            )
+            try:
+                contents.append(
+                    {
+                        "data": requests.get(image["url"]).content,
+                        "mime_type": image["mimetype"]
+                    }
+                )
+                logger.info(f"Added image content from {image['url']}")
+            except requests.RequestException as e:
+                logger.error(f"Failed to fetch image from {image['url']}: {e}")
     return contents
-
 
 def extract_event_data_from_post(post):
     text_image_describe_prompt = f"""
@@ -89,32 +101,38 @@ Assign the appropriate class to each identified item.
 Ensure that all data is accurately recorded and categorized within the database."""
     
     contents = flatten_post_contents_for_gemini(text_image_describe_prompt, post)
-    #print(contents)
-    fnresult = model.generate_content(
-        contents=contents,
-        request_options={'retry': retry.Retry()},
-        tools=[get_info],
-        tool_config={'function_calling_config': 'ANY'}
-    )
-    functioncalldata = fnresult.candidates[0].content.parts[0].function_call
-    eventdata = type(functioncalldata).to_dict(functioncalldata)
-    #return eventdata
-    if eventdata["args"]["post"] is None:
+    logger.debug(f"Flattened post contents: {contents}")
+
+    try:
+        fnresult = model.generate_content(
+            contents=contents,
+            request_options={'retry': retry.Retry()},
+            tools=[get_info],
+            tool_config={'function_calling_config': 'ANY'}
+        )
+        functioncalldata = fnresult.candidates[0].content.parts[0].function_call
+        eventdata = type(functioncalldata).to_dict(functioncalldata)
+        logger.info(f"Extracted event data: {eventdata}")
+        if eventdata["args"]["post"] is None:
+            logger.warning("No data extracted from post.")
+            return None
+        return eventdata["args"]["post"]
+    except Exception as e:
+        logger.error(f"Error during content generation: {e}")
         return None
-    return eventdata["args"]["post"]
 
 if __name__ == "__main__":
-
     while True:
         post = getUnclassifiedPostInformation()
-        print(post)
         if post:
-            
+            logger.info(f"Processing post: {post['postid']}")
             extracted = extract_event_data_from_post(post)
-            print(extracted)
-            putExtractedInformation(extracted,post)
-            time.sleep(3)
+            if extracted:
+                logger.info(f"Extracted data: {extracted}")
+                putExtractedInformation(extracted, post)
+            else:
+                logger.warning("No information extracted from post.")
         else:
-            print("DONE!")
+            logger.info("No more unclassified posts. Exiting.")
             break
-
+        time.sleep(1)
