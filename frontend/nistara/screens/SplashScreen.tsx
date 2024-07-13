@@ -1,8 +1,20 @@
 import { View, Text, Pressable, Image, StyleSheet, TouchableOpacity} from "react-native";
-import React from "react";
+import React, {useEffect} from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import { dbClient } from "../database/database";
 
 const SplashScreen = ({ navigation }: {navigation: any}) => {
+
+  // useEffect(()=>{
+  //   const testDB = async ()=>{
+  //     const client : dbClient = new dbClient();
+  //     const getPostsResponse = await client.addPost(1,"trial",[],1720263740389,[0,0]);
+  //     console.log(getPostsResponse.message);
+  //   }
+  //   testDB()
+  // },[])
+
+
   return (
     <LinearGradient style={styles.container} colors={["#f1f3ff", "#95A8EF"]} locations={[0, 0.45]}>
       <Image
@@ -20,12 +32,11 @@ const SplashScreen = ({ navigation }: {navigation: any}) => {
             style={{
                 ...styles.button,
                 ...{ backgroundColor: '#FFFFFF'},
-                ...styles.getStartedButton
+                ...styles.howItWorksButton
             }}
             onPress = {()=>{navigation.navigate("HomeTabs")}}
             >
-
-            <Text style={{ fontSize: 18, ... { color: '#95A8EF' } }}>Get started</Text>
+            <Text style={{ fontSize: 18, ... { color: '#95A8EF' } }}>Learn how it works</Text>
         </TouchableOpacity>
     </LinearGradient>
   );
@@ -55,7 +66,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "center",
   },
-  getStartedButton: {
+  howItWorksButton: {
     width: "95%",
     marginTop: 140,
   },
