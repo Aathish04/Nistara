@@ -4,7 +4,7 @@ from google.api_core import retry
 import requests
 import json
 import time
-from database import getUnclassifiedPostInformation, putExtractedInformation
+from database import getUnclassifiedPostInformation, putExtractedInformation, insertData
 # Or use `os.getenv('GOOGLE_API_KEY')` to fetch an environment variable.
 
 
@@ -24,11 +24,13 @@ post_schema = glm.Schema(
                 type=glm.Type.OBJECT,
                 properties={
                     "itemName": glm.Schema(type=glm.Type.STRING),
-                    "quantity": glm.Schema(type=glm.Type.INTEGER)
+                    "quantity": glm.Schema(type=glm.Type.INTEGER),
+                    "class" :   glm.Schema(type=glm.Type.STRING,enum=["FOOD_AND_WATER","EMERGENCY_LIGHTING_AND_COMMUNICATION","HEALTH_AND_HYGIENE","TOOLS_AND_EQUIPMENT","ENTERTAINMENT","CLOTHING_AND_SHELTER","SAFETY_AND_PROTECTION"],format="enum")
                 }
             )
         ),
-        "category": glm.Schema(type=glm.Type.STRING,enum=["REQUEST_ITEM","REQUEST_EVACUATION","REQUEST_SEARCH","REQUEST_FIRST_AID","OFFER","INFORMATION"],format="enum"),
+        "category": glm.Schema(type=glm.Type.STRING,enum=["REQUEST_ITEM","REQUEST_EVACUATION","REQUEST_SEARCH","OFFER","INFORMATION"],format="enum"),
+       
     },
     description="Information to be extracted from post"
 )
@@ -61,8 +63,30 @@ def flatten_post_contents_for_gemini(prompt, post):
 model = genai.GenerativeModel(model_name='models/gemini-1.5-flash-latest')
 
 def extract_event_data_from_post(post):
-    details = "the items required, "
-    text_image_describe_prompt = f"""Please Add to the Database {details} from the given post caption and media. post is {post}. Find the category based on the text content."""
+    text_image_describe_prompt = f"""
+    You are an information extraction system. Your task is to extract information from a given post and categorize it accordingly. The possible categories for the post are:
+
+REQUEST_ITEM
+REQUEST_EVACUATION
+REQUEST_SEARCH
+OFFER
+INFORMATION
+For each item extracted from the post, assign it to one of the following classes:
+
+FOOD_AND_WATER
+EMERGENCY_LIGHTING_AND_COMMUNICATION
+HYGIENE
+MEDICINE
+TOOLS_AND_EQUIPMENT
+CLOTHING_AND_SHELTER
+SAFETY_AND_PROTECTION
+The post details are given by {post}. Your task is to:
+
+Identify the category of the post.
+Extract the items required along with their quantities.
+Assign the appropriate class to each identified item.
+Ensure that all data is accurately recorded and categorized within the database."""
+    
     contents = flatten_post_contents_for_gemini(text_image_describe_prompt, post)
     #print(contents)
     fnresult = model.generate_content(
@@ -93,17 +117,22 @@ if __name__ == "__main__":
     # print(extract_event_data_from_post(post))
 
 
-    # while True:
-    #     post = getUnclassifiedPostInformation()
-    #     print(post)
-    #     if post:
+    while True:
+        post = getUnclassifiedPostInformation()
+        print(post)
+        if post:
             
-    #         extracted = extract_event_data_from_post(post)
-    #         print(extracted)
-    #         putExtractedInformation(extracted,post)
-    #         time.sleep(3)
+            extracted = extract_event_data_from_post(post)
+            print(extracted)
+            putExtractedInformation(extracted,post)
+            time.sleep(3)
+        else:
+            print("DONE!")
+            break
 
-    post = getUnclassifiedPostInformation()
-    extracted = extract_event_data_from_post(post)
-    print(extracted)
-    putExtractedInformation(extracted,post)
+    # post = getUnclassifiedPostInformation()
+    # extracted = extract_event_data_from_post(post)
+    # print(extracted)
+    # putExtractedInformation(extracted,post)
+    # insertData()
+
