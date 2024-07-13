@@ -26,6 +26,7 @@ import SOSScreen from './screens/SOSScreen';
 
 // User Profile Screens
 import YourProfileScreen from './screens/YourProfileScreen';
+import WritePost from './screens/WritePost';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -116,6 +117,7 @@ function HomeTabs({navigation}:{navigation:any}){
       component={DonateScreen}
       options={{ headerShown: false }}
     />
+
   </Tab.Navigator>
 
   <TouchableOpacity
@@ -166,6 +168,11 @@ export default function App() {
         <Stack.Screen 
           name="Profile"
           component={YourProfileScreen}
+          options= {{ headerShown: false}}
+        />
+         <Stack.Screen 
+          name="WritePost"
+          component={WritePost}
           options= {{ headerShown: false}}
         />
       </Stack.Navigator>
