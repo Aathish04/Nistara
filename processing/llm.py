@@ -1,3 +1,4 @@
+from os import environ
 import google.generativeai as genai
 import google.ai.generativelanguage as glm
 from google.api_core import retry
@@ -7,13 +8,11 @@ import time
 from database import getUnclassifiedPostInformation, putExtractedInformation, insertData
 # Or use `os.getenv('GOOGLE_API_KEY')` to fetch an environment variable.
 
+from dotenv import load_dotenv
+load_dotenv()
 
-
-with open("NistaraDB-token.json") as f:
-    secrets = json.load(f)
-
-GOOGLE_API_KEY = secrets["google_api_key"]
-genai.configure(api_key=GOOGLE_API_KEY)
+GEMINI_API_KEY = environ.get("GEMINI_API_KEY","No-Key")
+genai.configure(api_key=GEMINI_API_KEY)
 
 post_schema = glm.Schema(
     type=glm.Type.OBJECT,
@@ -47,6 +46,9 @@ get_info = glm.FunctionDeclaration(
     )
 )
 
+model = genai.GenerativeModel(model_name='models/gemini-1.5-flash-latest')
+
+
 def flatten_post_contents_for_gemini(prompt, post):
     contents = [prompt]
     # Ensure the multimediaURL key exists before iterating
@@ -60,7 +62,6 @@ def flatten_post_contents_for_gemini(prompt, post):
             )
     return contents
 
-model = genai.GenerativeModel(model_name='models/gemini-1.5-flash-latest')
 
 def extract_event_data_from_post(post):
     text_image_describe_prompt = f"""
@@ -103,19 +104,6 @@ Ensure that all data is accurately recorded and categorized within the database.
     return eventdata["args"]["post"]
 
 if __name__ == "__main__":
-#     post = {
-#     "postID": "1",
-#     "userID": "123456",
-#     "textualInfo": '''
-# Urgent help needed! 🚨 Please help us leave this place. 🙏 #CycloneRelief #HelpNeeded #Donate
-
-#  ''',
- 
-#     "timestamp": "2024-01-01T10:00:00Z",
-#     "geoLocation": "(40.712776, -74.005974)"
-# }
-    # print(extract_event_data_from_post(post))
-
 
     while True:
         post = getUnclassifiedPostInformation()
@@ -129,10 +117,4 @@ if __name__ == "__main__":
         else:
             print("DONE!")
             break
-
-    # post = getUnclassifiedPostInformation()
-    # extracted = extract_event_data_from_post(post)
-    # print(extracted)
-    # putExtractedInformation(extracted,post)
-    # insertData()
 
