@@ -1,6 +1,7 @@
 package expo.modules.nearbyconnectionsexpo
 
 import android.content.Context
+import android.util.Base64
 import android.Manifest
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.functions.Coroutine
@@ -104,11 +105,15 @@ class NearbyConnectionsExpoModule : Module() {
         sendEvent("onEndpointLost", mapOf("endpointId" to event.endpointId))
       }
       is NearbyEvent.PayloadReceived -> {
+
         sendEvent("onPayloadReceived", mapOf(
           "endpointId" to event.endpointId,
-          "payload" to event.payload // You might need to encode the payload to a suitable format
+          "payload" to byteArrayToBase64(event.payload) // You might need to encode the payload to a suitable format
         ))
       }
     }
+  }
+  fun byteArrayToBase64(byteArray: ByteArray): String {
+    return Base64.encodeToString(byteArray, Base64.DEFAULT)
   }
 }
