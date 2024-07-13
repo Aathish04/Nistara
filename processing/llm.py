@@ -133,6 +133,5 @@ if __name__ == "__main__":
             else:
                 logger.warning("No information extracted from post.")
         else:
-            logger.info("No more unclassified posts. Exiting.")
-            break
-        time.sleep(1)
+            logger.info("No more unclassified posts. Waiting for more posts.")
+        time.sleep(3)
