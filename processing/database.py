@@ -60,9 +60,9 @@ def insertData():
     logger.info("Inserted sample records.")
 
 def getUnclassifiedPostInformation():
-    query = f"SELECT * FROM main.POSTS WHERE classifier=? AND isclassified=? LIMIT 1 ALLOW FILTERING"
+    query = f"SELECT * FROM main.POSTS WHERE (classifier IN (?,?)) AND isclassified=? LIMIT 1 ALLOW FILTERING"
     prepared_statement = session.prepare(query)
-    row = session.execute(prepared_statement, (-1, False), trace=True)
+    row = session.execute(prepared_statement, (-1, INSTANCEID,False), trace=True)
     try:
         row_entry = row[0]
         logger.info(f"Got unclassified post: {row_entry}")
