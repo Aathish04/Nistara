@@ -37,3 +37,4 @@ yarn-error.*
 
 NistaraDB-token.json
 env.tsx
+data.tsx

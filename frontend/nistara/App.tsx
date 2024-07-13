@@ -15,6 +15,7 @@ import SplashScreen from './screens/SplashScreen';
 import OnboardingInit from './screens/Onboarding';
 import AadhaarOnboarding from './screens/AadhaarAuth';
 import SignUpScreen from './screens/SignUpScreen';
+import SetPasswordScreen from './screens/SetPasswordScreen';
 
 // Home Bottom Nav Tabs
 import HomeScreen from './screens/HomeScreen';
@@ -39,6 +40,7 @@ function AuthStack(){
         <Stack.Screen name = "OnboardingInit" component = {OnboardingInit} />
         <Stack.Screen name = "AadhaarOnboarding" component={AadhaarOnboarding} />
         <Stack.Screen name = "SignUp" component = {SignUpScreen} />
+        <Stack.Screen name="SetPassword" component = {SetPasswordScreen} />
 
     </Stack.Navigator>
   )
