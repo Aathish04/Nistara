@@ -13,8 +13,8 @@ logger = getLogger(__name__)
 
 load_dotenv()
 
-GEMINI_API_KEY = environ.get("GEMINI_API_KEY", "No-Key")
-genai.configure(api_key=GEMINI_API_KEY)
+LLM_API_KEY = environ.get("LLM_API_KEY", "No-Key")
+genai.configure(api_key=LLM_API_KEY)
 
 logger.info("Configured Google Generative AI with provided API key.")
 
