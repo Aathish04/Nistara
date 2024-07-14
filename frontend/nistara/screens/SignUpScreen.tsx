@@ -113,7 +113,7 @@ const SignUpScreen = ({route, navigation}:{route:any, navigation:any})=>{
 
     return(
         <View style={styles.container}>
-            <Ionicons name="arrow-back" size={30} color="#000"/>
+            <Ionicons name="chevron-back" size={30} color="#000"/>
             <View style={styles.header}>
                 <View style={styles.circleView}></View>
                 <Image source={{ uri: 'data:image/jpeg;base64,'+aadhaarInfo.photo }} style={styles.aadhaarPhoto} />
@@ -210,13 +210,13 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         width: 115,
         height: 115,
-        marginTop: 70,
+        marginTop: 80,
         marginLeft: -75
     },
     headerText:{
         fontSize: 28,
         fontWeight: "bold",
-        marginTop: 80,
+        marginTop: 90,
         marginLeft: 25,
         color: "#95A8EF"
     },

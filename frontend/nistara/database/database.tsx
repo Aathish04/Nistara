@@ -2,6 +2,19 @@ import axios from 'axios';
 import { sha256 } from 'js-sha256';
 import { Credential } from './env';
 
+interface User {
+  userID: string,
+  userName: string,
+  address: string,
+  dateOfBirth: string,
+  gender: string,
+  profileImage: string,
+  maskedNumber: string, 
+  email: string,
+  phone: string,
+  password: string
+}
+
 const cred = new Credential();
 const ASTRA_DB_ID :string = cred.ASTRA_DB_ID
 const ASTRA_DB_REGION : string = cred.ASTRA_DB_REGION
@@ -127,6 +140,29 @@ export class dbClient {
     } catch (e) {
       console.error('Failed fetching all information posts:', e);
       return { message: 'Failed fetching all information posts' };
+    }
+  }
+
+  async addUser(user: User){
+    const newUser = {
+      userid: user.userID,
+      username: user.userName,
+      address: user.address,
+      dateofbirth: user.dateOfBirth,
+      gender: user.gender,
+      profileimage: user.profileImage,
+      maskednumber: user.maskedNumber, 
+      email: user.email,
+      phone: user.phone,
+      password: user.password
+    };
+    try {
+      await axios.post(`${this.baseUrl}/users`, newUser, { headers: this.headers });
+      console.log('User sign up successful');
+      return { message: 'User sign up successful' };
+    } catch (e) {
+      console.error('Failed: User sign up', e);
+      return { message: 'Failed: User sign up' };
     }
   }
 }
