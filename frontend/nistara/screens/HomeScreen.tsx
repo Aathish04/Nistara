@@ -2,8 +2,7 @@ import React from 'react';
 import { Text , TouchableOpacity} from 'react-native';
 import { View, StyleSheet  } from 'react-native';
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import Icon from 'react-native-vector-icons/Ionicons'; // Optional, if you want to use an icon
-import { useNavigation } from '@react-navigation/native';
+import {Ionicons} from '@expo/vector-icons'
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -41,14 +40,13 @@ const HomeTopTabs = () =>{
     )
 }
 
-const HomeScreen = ({}) =>{
-    const navigation = useNavigation();
+const HomeScreen = ({navigation}: {navigation:any}) =>{
     return(
 
     <View style={styles.container}>
             <HomeTopTabs />
             <TouchableOpacity style={styles.button} onPress={()=>{navigation.navigate("WritePost")}}>
-      <Icon name="pencil" size={24} color="#fff" />
+      <Ionicons name="pencil" size={24} color="#fff" />
     </TouchableOpacity>
     </View>
     )

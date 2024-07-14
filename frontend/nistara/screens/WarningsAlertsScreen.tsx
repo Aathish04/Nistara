@@ -3,6 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from "@expo/vector-icons";
+import { Credential } from '../database/env';
+
+const cred = new Credential();
+const BING_MAPS_API_KEY: string = cred.BING_MAPS_API_KEY
 
 interface Alert {
   severity: string;
@@ -55,6 +59,7 @@ const WarningsAlertsScreen: React.FC = () => {
           },
         });
         const data: Alert[] = await response.json();
+        // console.log(data)
         setAlerts(data);
       } catch (err) {
         console.error('Error fetching data: ', err);
@@ -85,59 +90,63 @@ const WarningsAlertsScreen: React.FC = () => {
 
   const generateHtmlContent = () => {
     const userCoords = userLocation
-      ? `${userLocation.coords.latitude}, ${userLocation.coords.longitude}`
-      : '20.5937, 78.9629';
-
+      ? `${userLocation.coords.latitude},${userLocation.coords.longitude}`
+      : '20.5937,78.9629';
+  
     const markers = alerts.map(alert => {
-      const [longitude, latitude] = alert.centroid.split(',').map(Number);
+      const [latitude, longitude] = alert.centroid.split(',').map(Number);
       return `{
-        position: { lat: ${latitude}, lng: ${longitude} },
-        severityColor: "${alert.severity_color}"
+        location: new Microsoft.Maps.Location(${longitude}, ${latitude}),
+        severityColor: "${alert.severity_color}",
+        data: ${JSON.stringify(alert)}
       }`;
     }).join(',');
-
+  
     return `
       <!DOCTYPE html>
-      <html>
+      <html lang="en">
       <head>
-        <title>TomTom Map</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.14.0/maps/maps-web.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.14.0/maps/maps.css"/>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bing Maps Integration</title>
+        <script type="text/javascript" src="https://www.bing.com/api/maps/mapcontrol?key=${BING_MAPS_API_KEY}"></script>
+        <script type="text/javascript">
+          let map;
+          function loadMapScenario() {
+            map = new Microsoft.Maps.Map(document.getElementById('map'), {
+              center: new Microsoft.Maps.Location(${userCoords}),
+              zoom: 5
+            });
+  
+            const markers = [${markers}];
+            markers.forEach(markerInfo => {
+              const pin = new Microsoft.Maps.Pushpin(markerInfo.location, {
+                color: markerInfo.severityColor
+              });
+              pin.metadata = markerInfo.data;
+              Microsoft.Maps.Events.addHandler(pin, 'click', function () {
+                window.ReactNativeWebView.postMessage(JSON.stringify(pin.metadata));
+              });
+              map.entities.push(pin);
+            });
+          }
+
+        </script>
         <style>
+          html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+          }
           #map {
             height: 100%;
             width: 100%;
           }
         </style>
       </head>
-      <body>
+      <body onload="loadMapScenario();">
         <div id="map"></div>
-        <script>
-          var map = tt.map({
-            key: 'IpZWkH0yM2SsymlhplbeLqMrAuBc3mZd',
-            container: 'map',
-            center: [${userCoords}],
-            zoom: 10
-          });
-
-          var markers = [${markers}];
-          markers.forEach(marker => {
-            var el = document.createElement('div');
-            el.style.backgroundColor = marker.severityColor;
-            el.style.width = '20px';
-            el.style.height = '20px';
-            el.style.borderRadius = '50%';
-            el.style.cursor = 'pointer';
-
-            new tt.Marker({ element: el })
-              .setLngLat(marker.position)
-              .addTo(map)
-              .on('click', () => {
-                window.ReactNativeWebView.postMessage(JSON.stringify(marker));
-              });
-          });
-        </script>
       </body>
       </html>
     `;
@@ -146,20 +155,21 @@ const WarningsAlertsScreen: React.FC = () => {
   return (
     <View style={{ flex: 1 }}>
       <WebView
-        originWhitelist={['*']}
-        source={{ html: generateHtmlContent() }}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        onMessage={(event: any) => {
-          const alert = JSON.parse(event.nativeEvent.data);
-          handleMarkerPress(alert);
-        }}
-      />
+  originWhitelist={['*']}
+  source={{ html: generateHtmlContent() }}
+  javaScriptEnabled={true}
+  domStorageEnabled={true}
+  style={{ flex: 1 }}
+  onMessage={(event) => {
+    const alert = JSON.parse(event.nativeEvent.data);
+    handleMarkerPress(alert);
+  }}
+/>
 
-      {(selectedAlert) ? (
+
+      {selectedAlert && (
         <View style={styles.overlay}>
           <View style={[styles.modalContent]}>
-
             <View style={styles.modalHeader}>
               <View style={{ flex: 1, flexDirection: "row", justifyContent: "flex-start" }}>
                 <Ionicons name="warning-outline" size={26} color={selectedAlert.severity_color} style={{ paddingTop: 7 }} />
@@ -171,41 +181,36 @@ const WarningsAlertsScreen: React.FC = () => {
                 <Ionicons name="close" size={24} color={"black"} />
               </TouchableOpacity>
             </View>
-            <>
-
+            <View>
               <View style={{ flexDirection: 'row', paddingBottom: 10 }}>
                 <Text>{'\u2022'}</Text>
-                <Text style={{ flex: 1, paddingLeft: 5 }}>{selectedAlert.severity_level.charAt(0).toUpperCase()}{selectedAlert.severity_level.substring(1).toLowerCase()} occurrence of
-                  {' ' + selectedAlert.disaster_type.toLowerCase()}
+                <Text style={{ flex: 1, paddingLeft: 5 }}>
+                  {selectedAlert.severity_level.charAt(0).toUpperCase()}{selectedAlert.severity_level.substring(1).toLowerCase()} occurrence of {' ' + selectedAlert.disaster_type.toLowerCase()}
                 </Text>
               </View>
-
               <View style={{ flexDirection: 'row', paddingBottom: 10 }}>
                 <Text>{'\u2022'}</Text>
                 <Text style={{ flex: 1, paddingLeft: 5 }}>Expected in {selectedAlert.area_description}</Text>
               </View>
-
-              {(selectedAlert.severity === "WARNING" || selectedAlert.severity == "Orange" || selectedAlert.severity == "Red" || selectedAlert.severity == "Yellow") ? (
+              {(selectedAlert.severity === "WARNING" || selectedAlert.severity === "Orange" || selectedAlert.severity === "Red" || selectedAlert.severity === "Yellow") ? (
                 <View style={{ flexDirection: 'row', paddingBottom: 10 }}>
                   <Text>{'\u2022'}</Text>
                   <Text style={{ flex: 1, paddingLeft: 5 }}>Individuals in and near this area are requested to stay on 'ALERT'</Text>
-                </View>) : (
+                </View>
+              ) : (
                 <View style={{ flexDirection: 'row', paddingBottom: 10 }}>
                   <Text>{'\u2022'}</Text>
                   <Text style={{ flex: 1, paddingLeft: 5 }}>Individuals in and around this area are requested to stay on '{selectedAlert.severity}'</Text>
                 </View>
               )}
-
               <View style={{ flexDirection: 'row', paddingBottom: 10 }}>
                 <Text>{'\u2022'}</Text>
                 <Text style={{ flex: 1, paddingLeft: 5 }}>Expected to last from {formatDateTime(selectedAlert.effective_start_time)} to {formatDateTime(selectedAlert.effective_end_time)}</Text>
               </View>
-
-            </>
-
+            </View>
           </View>
         </View>
-      ) : (<></>)}
+      )}
     </View>
   );
 };
@@ -222,23 +227,23 @@ const styles = StyleSheet.create({
     zIndex: 2,
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
-    paddingBottom: 10
+    paddingBottom: 10,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    height: 60
+    height: 60,
   },
   modalContent: {
-    padding: 20
+    padding: 20,
   },
   modalTitle: {
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 10,
     width: 260,
-    paddingLeft: 20
-  }
+    paddingLeft: 20,
+  },
 });
 
 export default WarningsAlertsScreen;
