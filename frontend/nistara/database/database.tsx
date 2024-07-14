@@ -22,19 +22,22 @@ export class dbClient {
     };
   }
 
-  async addPost(userID: number, textualInfo: string, multimediaURL: string[], timestamp: number, geoLocation: [number, number]) {
+  async addPost(userID: string, username: string, textualInfo: string, multimediaURL: string[], timestamp: number, geoLocation: [number, number]) {
     let postID: string = sha256(String(userID) + textualInfo + String(multimediaURL) + timestamp + String(geoLocation)).toString();
     const geoLocationStr = `(${geoLocation[0]},${geoLocation[1]})`
     console.log(geoLocationStr)
     const data = {
       postid: postID,
       userid: userID,
+      username: username,
+      profilephoto: null,
       textualinfo: textualInfo,
       multimediaurl: multimediaURL,
-      timestamp,
+      timestamp : timestamp,
       geolocation: geoLocationStr,
       classifier: -1,
       isclassified: false,
+      tag:null
     };
     try {
       await axios.post(`${this.baseUrl}/posts`, data, { headers: this.headers });
@@ -50,14 +53,18 @@ export class dbClient {
     try {
       let response = await axios.get(`${this.baseUrl}/posts/rows`, { headers: this.headers });
       const posts = response.data.data.map((post: any) => ({
-        postID: post.postid,
-        userID: post.userid,
-        textualInfo: post.textualinfo,
-        multimediaURL: post.multimediaurl,
+        postid: post.postid,
+        userid: post.userid,
+        textualinfo: post.textualinfo,
+        multimediaurl: post.multimediaurl,
         timestamp: post.timestamp,
-        geoLocation: post.geolocation,
+        geolocation: post.geolocation,
         classifier: post.classifier,
-        isClassified: post.isclassified,
+        isclassified: post.isclassified,
+        profilephoto: post.profilephoto,
+        tag: post.tag,
+        username: post.username
+
       }));
       return { message: 'Post Fetch Successful', result: posts };
     } catch (e) {

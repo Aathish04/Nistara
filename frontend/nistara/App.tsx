@@ -1,12 +1,17 @@
-// import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from 'expo-status-bar';
 // import { StyleSheet, Text, View } from 'react-native';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons,SimpleLineIcons } from "@expo/vector-icons";
-import { TouchableOpacity, Text, View, Image } from 'react-native';
+import { TouchableOpacity, StyleSheet,Text, View, Image, Alert, Button} from 'react-native';
+
+// For expo-nearby-connections
+import { Buffer } from 'buffer';
+import { startAdvertising, startDiscovery, sanitycheck,requestPermissionsAsync, addOnEndpointConnectedListener, addOnEndpointLostListener, addonPayloadReceivedListener, sendPayload} from './modules/nearby-connections-expo';
+// import { StatusBar } from 'expo-status-bar';
 
 // Splash Screen
 import SplashScreen from './screens/SplashScreen';
@@ -15,6 +20,7 @@ import SplashScreen from './screens/SplashScreen';
 import OnboardingInit from './screens/Onboarding';
 import AadhaarOnboarding from './screens/AadhaarAuth';
 import SignUpScreen from './screens/SignUpScreen';
+import SetPasswordScreen from './screens/SetPasswordScreen';
 
 // Home Bottom Nav Tabs
 import HomeScreen from './screens/HomeScreen';
@@ -25,6 +31,7 @@ import SOSScreen from './screens/SOSScreen';
 
 // User Profile Screens
 import YourProfileScreen from './screens/YourProfileScreen';
+import WritePost from './screens/WritePost';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -39,6 +46,7 @@ function AuthStack(){
         <Stack.Screen name = "OnboardingInit" component = {OnboardingInit} />
         <Stack.Screen name = "AadhaarOnboarding" component={AadhaarOnboarding} />
         <Stack.Screen name = "SignUp" component = {SignUpScreen} />
+        <Stack.Screen name="SetPassword" component = {SetPasswordScreen} />
 
     </Stack.Navigator>
   )
@@ -114,6 +122,7 @@ function HomeTabs({navigation}:{navigation:any}){
       component={DonateScreen}
       options={{ headerShown: false }}
     />
+
   </Tab.Navigator>
 
   <TouchableOpacity
@@ -138,7 +147,62 @@ function HomeTabs({navigation}:{navigation:any}){
 }
 
 export default function App() {
-  return (
+  let [perms,setPerms] = useState("No Perms Yet")
+  let [conns, setConns] = useState<Array<string>>([]);
+  const encoder =  new TextEncoder();
+  let arr = new Uint8Array();
+  async function requestPerms(){
+    setPerms(JSON.stringify(await requestPermissionsAsync()))
+  }
+
+  function decodeUint8Array(uint8Array: Uint8Array): string {
+    let result = '';
+    for (let i = 0; i < uint8Array.length; i++) {
+      result += String.fromCharCode(uint8Array[i]);
+    }
+    return result;
+  }
+  
+  addOnEndpointConnectedListener(
+  (event) => {
+    console.log("Endpoint Found:" + JSON.stringify(event));
+    let oldConns = [...conns];
+    oldConns.push(event.endpointId)
+    oldConns = [...new Set(oldConns)];
+    setConns(oldConns)
+  });
+
+  addOnEndpointLostListener(
+    (event)=>{
+      console.log("Endpoint Lost: "+JSON.stringify(event))
+      let oldConns = new Set(conns)
+      oldConns.delete(event.endpointId);
+      setConns([...oldConns]);
+    }
+  )
+
+  addonPayloadReceivedListener(
+    (event)=>{
+      console.log(event)
+      Alert.alert(`Got Message: ${Buffer.from(event.payload, 'base64').toString('utf-8')}!`)
+    }
+  )
+  function sendData(){
+    Alert.alert("Send Payload","Send Payload",[
+      {
+        text: 'Send Hello',
+        onPress: () => {for (let ep of conns){sendPayload(ep,encoder.encode("Hello"))}},
+      },
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {text: 'Send OK', onPress: () => {for (let ep of conns){sendPayload(ep,encoder.encode("OK"))}}},
+    ])
+  }
+
+  let actualview = (
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
@@ -166,8 +230,35 @@ export default function App() {
           component={YourProfileScreen}
           options= {{ headerShown: false}}
         />
+         <Stack.Screen 
+          name="WritePost"
+          component={WritePost}
+          options= {{ headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
+  let meshtestview = (
+    <View style={styles.container}>
+      <Text>{sanitycheck()}</Text>
+      <Text>{perms}</Text>
+      <Button title="Request Perms" onPress={requestPerms}></Button>
+      <Button title="Start Advertising" onPress={startAdvertising}></Button>
+      <Button title="Start Discovery" onPress={startDiscovery}></Button>
+      <Text id='Connections'>Connections: {JSON.stringify(conns)}</Text>
+      <Button title="Send Payload" onPress={sendData}></Button>
+      <StatusBar style="auto" />
+    </View>
+  )
+  
+  return actualview
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

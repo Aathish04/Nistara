@@ -34,7 +34,7 @@ const SplashScreen = ({ navigation }: {navigation: any}) => {
                 ...{ backgroundColor: '#FFFFFF'},
                 ...styles.howItWorksButton
             }}
-            onPress = {()=>{navigation.navigate("HomeTabs")}}
+            onPress = {()=>{navigation.navigate("Auth", {screen: "SignUp"})}}
             >
             <Text style={{ fontSize: 18, ... { color: '#95A8EF' } }}>Learn how it works</Text>
         </TouchableOpacity>
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   howItWorksButton: {
     width: "95%",
-    marginTop: 140,
+    // marginTop: 140, // Aathish says Hi
   },
   button: {
     paddingBottom: 14,

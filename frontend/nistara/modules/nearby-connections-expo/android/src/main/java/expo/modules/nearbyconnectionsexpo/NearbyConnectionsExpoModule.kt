@@ -1,47 +1,119 @@
 package expo.modules.nearbyconnectionsexpo
 
+import android.content.Context
+import android.util.Base64
+import android.Manifest
+import expo.modules.kotlin.exception.CodedException
+import expo.modules.kotlin.functions.Coroutine
+import expo.modules.kotlin.functions.AsyncFunction
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import kotlinx.coroutines.Dispatchers
+import android.util.Log
+import kotlinx.coroutines.*
 
 class NearbyConnectionsExpoModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
+  private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+  // val context = appContext.reactContext ?: throw CodedException("No React context")
+  val context:Context get() = appContext.reactContext ?: throw CodedException("No React context")
   override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('NearbyConnectionsExpo')` in JavaScript.
     Name("NearbyConnectionsExpo")
 
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants(
-      "PI" to Math.PI
-    )
-
     // Defines event names that the module can send to JavaScript.
-    Events("onChange")
+    Events("onEndpointConnected", "onEndpointLost", "onPayloadReceived")
 
     // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
+    Function("sanitycheck") {
+      "Can Make Native Calls!"
     }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
+    AsyncFunction("startAdvertising") Coroutine { ->
+      val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
+      val startAdvertisingJob = coroutineScope.launch {
+        nearbyConnections.startAdvertising().collect { event -> handleNearbyEvent(event)}
+      }
+      return@Coroutine startAdvertisingJob.isActive
     }
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
-    View(NearbyConnectionsExpoView::class) {
-      // Defines a setter for the `name` prop.
-      Prop("name") { view: NearbyConnectionsExpoView, prop: String ->
-        println(prop)
+    AsyncFunction("startDiscovery") Coroutine { ->
+      val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
+      // Launch a coroutine to collect the flow and send events to JavaScript
+      val startDiscoveryJob = coroutineScope.launch {
+        nearbyConnections.startDiscovery().collect { event -> handleNearbyEvent(event)}
+      }
+      return@Coroutine startDiscoveryJob.isActive
+    }
+
+    AsyncFunction("sendPayload") Coroutine { endpointId: String, bytes: ByteArray ->
+      val nearbyConnections = NearbyConnections(context, Dispatchers.IO)
+      return@Coroutine nearbyConnections.sendPayload(endpointId, bytes)
+    }
+
+    AsyncFunction("requestPermissionsAsync") Coroutine { ->
+      val permissionsManager = appContext.permissions ?: throw NoPermissionsModuleException()
+      NearbyConnectionsHelpers.askForPermissionsWithPermissionsManager(permissionsManager,Manifest.permission.ACCESS_COARSE_LOCATION)
+      NearbyConnectionsHelpers.askForPermissionsWithPermissionsManager(
+        permissionsManager,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.BLUETOOTH,Manifest.permission.BLUETOOTH_ADMIN,Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.BLUETOOTH_ADVERTISE,Manifest.permission.BLUETOOTH_CONNECT,
+        Manifest.permission.ACCESS_WIFI_STATE,Manifest.permission.CHANGE_WIFI_STATE,
+        Manifest.permission.NEARBY_WIFI_DEVICES // Only for Tiramisu and after.
+        );
+
+      return@Coroutine getPermissionsAsync()
+    }
+
+    AsyncFunction("getPermissionsAsync") Coroutine { ->
+      return@Coroutine getPermissionsAsync()
+    }
+  }
+
+  private suspend fun getPermissionsAsync(): Map<String, PermissionRequestResponse> {
+    appContext.permissions?.let {
+      val coarseLocationPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_COARSE_LOCATION)
+      val fineLocationPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_FINE_LOCATION)
+      val bluetoothPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.BLUETOOTH)
+      val bluetoothAdminPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.BLUETOOTH_ADMIN)
+      val bluetoothScanPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.BLUETOOTH_SCAN)
+      val bluetoothAdvertisePermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.BLUETOOTH_ADVERTISE)
+      val bluetoothConnectPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.BLUETOOTH_CONNECT)
+      val accessWifiStatePermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.ACCESS_WIFI_STATE)
+      val changeWifiStatePermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.CHANGE_WIFI_STATE)
+      val nearbyWifiDevicesPermission = NearbyConnectionsHelpers.getPermissionsWithPermissionsManager(it, Manifest.permission.NEARBY_WIFI_DEVICES)
+
+      return mapOf(
+            "coarseLocationPermission" to coarseLocationPermission,
+            "fineLocationPermission" to fineLocationPermission,
+            "bluetoothPermission" to bluetoothPermission,
+            "bluetoothAdminPermission" to bluetoothAdminPermission,
+            "bluetoothScanPermission" to bluetoothScanPermission,
+            "bluetoothAdvertisePermission" to bluetoothAdvertisePermission,
+            "bluetoothConnectPermission" to bluetoothConnectPermission,
+            "accessWifiStatePermission" to accessWifiStatePermission,
+            "changeWifiStatePermission" to changeWifiStatePermission,
+            "nearbyWifiDevicesPermission" to nearbyWifiDevicesPermission
+        )
+    } ?: throw NoPermissionsModuleException()
+  }
+
+  private suspend fun handleNearbyEvent(event: NearbyEvent) {
+    when (event) {
+      is NearbyEvent.EndpointConnected -> {
+        sendEvent("onEndpointConnected", mapOf("endpointId" to event.endpointId))
+      }
+      is NearbyEvent.EndpointLost -> {
+        sendEvent("onEndpointLost", mapOf("endpointId" to event.endpointId))
+      }
+      is NearbyEvent.PayloadReceived -> {
+
+        sendEvent("onPayloadReceived", mapOf(
+          "endpointId" to event.endpointId,
+          "payload" to byteArrayToBase64(event.payload) // You might need to encode the payload to a suitable format
+        ))
       }
     }
+  }
+  fun byteArrayToBase64(byteArray: ByteArray): String {
+    return Base64.encodeToString(byteArray, Base64.DEFAULT)
   }
 }

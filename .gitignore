@@ -137,3 +137,4 @@ package-lock.json
 env.ts
 
 compose.yaml
+.vscode

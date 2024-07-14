@@ -1,26 +1,42 @@
-import { NativeModulesProxy, EventEmitter, Subscription } from 'expo-modules-core';
+import { requireNativeModule, EventEmitter, Subscription } from 'expo-modules-core';
 
 // Import the native module. On web, it will be resolved to NearbyConnectionsExpo.web.ts
 // and on native platforms to NearbyConnectionsExpo.ts
 import NearbyConnectionsExpoModule from './src/NearbyConnectionsExpoModule';
-import NearbyConnectionsExpoView from './src/NearbyConnectionsExpoView';
-import { ChangeEventPayload, NearbyConnectionsExpoViewProps } from './src/NearbyConnectionsExpo.types';
 
-// Get the native constant value.
-export const PI = NearbyConnectionsExpoModule.PI;
-
-export function hello(): string {
-  return NearbyConnectionsExpoModule.hello();
+export function sanitycheck(): string {
+  return NearbyConnectionsExpoModule.sanitycheck();
 }
 
-export async function setValueAsync(value: string) {
-  return await NearbyConnectionsExpoModule.setValueAsync(value);
+export async function startAdvertising():Promise<any>{
+  return NearbyConnectionsExpoModule.startAdvertising()
 }
 
-const emitter = new EventEmitter(NearbyConnectionsExpoModule ?? NativeModulesProxy.NearbyConnectionsExpo);
-
-export function addChangeListener(listener: (event: ChangeEventPayload) => void): Subscription {
-  return emitter.addListener<ChangeEventPayload>('onChange', listener);
+export async function startDiscovery():Promise<any>{
+  return NearbyConnectionsExpoModule.startDiscovery()
 }
 
-export { NearbyConnectionsExpoView, NearbyConnectionsExpoViewProps, ChangeEventPayload };
+export async function sendPayload(endpointId:string,bytes:Uint8Array):Promise<any>{
+  return NearbyConnectionsExpoModule.sendPayload(endpointId,bytes)
+}
+
+export async function requestPermissionsAsync():Promise<any>{
+  return NearbyConnectionsExpoModule.requestPermissionsAsync()
+}
+
+export async function getPermissionsAsync():Promise<any>{
+  return NearbyConnectionsExpoModule.getPermissionsAsync()
+}
+
+
+const emitter = new EventEmitter(NearbyConnectionsExpoModule ?? requireNativeModule('NearbyConnectionsExpo'));
+
+export function addOnEndpointConnectedListener(listener: (event:any) => void): Subscription {
+  return emitter.addListener<any>('onEndpointConnected', listener);
+}
+export function addOnEndpointLostListener(listener: (event:any) => void): Subscription {
+  return emitter.addListener<any>('onEndpointLost', listener);
+}
+export function addonPayloadReceivedListener(listener: (event:any) => void): Subscription {
+  return emitter.addListener<any>('onPayloadReceived', listener);
+}
