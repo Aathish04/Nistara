@@ -25,7 +25,8 @@ CREATE TABLE main.requests (
     username text,
     profilephoto text,
     timestamp timestamp,
-    textualinfo text
+    textualinfo text,
+    matcherID int,
 )
 
 
@@ -41,7 +42,8 @@ CREATE TABLE main.donation (
     profilephoto text,
     timestamp timestamp,
     textualinfo text,
-    class text
+    class text,
+    matcherID int,
 );
 
 
@@ -50,6 +52,9 @@ CREATE TABLE IF NOT EXISTS main.MATCHES
 (requestID text,
  donationID text,
  matcherID int,
+ matchtime timestamp,
+ requesterAck boolean,
+ donorAck bolean,
  PRIMARY KEY ((requestID,donationID))
 );
 
