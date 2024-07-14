@@ -1,46 +1,49 @@
-CREATE TABLE IF NOT EXISTS  main.POSTS
-(postID text,
- userID int,
- textualInfo text,
- multimediaURL list<text>,
- timestamp timestamp,
- geoLocation tuple<double,double>,
- classifier int,
- isClassified boolean,
- PRIMARY KEY (postID)
+CREATE TABLE main.posts (
+    postid text PRIMARY KEY,
+    userid text,
+    username text,
+    profilephoto text,
+    classifier int,
+    geolocation frozen<tuple<double, double>>,
+    isclassified boolean,
+    multimediaurl list<text>,
+    textualinfo text,
+    timestamp timestamp,
+    tag text
+)
+
+CREATE TABLE main.requests (
+    requestid text PRIMARY KEY,
+    requesttype text,
+    class text,
+    geolocation frozen<tuple<double, double>>,
+    iscomplete boolean,
+    item text,
+    quantity int,
+    postid text
+    userid text,
+    username text,
+    profilephoto text,
+    timestamp timestamp,
+    textualinfo text
+)
+
+
+CREATE TABLE main.donation (
+    donationid text PRIMARY KEY,
+    donatingitem text,
+    geolocation frozen<tuple<double, double>>,
+    iscomplete boolean,
+    postid text,
+    quantity int,
+    userid text,
+    username text,
+    profilephoto text,
+    timestamp timestamp,
+    textualinfo text,
+    class text
 );
 
-CREATE TABLE IF NOT EXISTS main.REQUESTS
-(requestID text,
- requestType text,
- postID text,
- userID int,
- requiredItem text,
- type text,
- geoLocation tuple<double,double>,
- isComplete boolean,
- PRIMARY KEY (requestID)
-);
-
-CREATE TABLE IF NOT EXISTS main.DONATIONS
-(donationID text,
- postID text,
- userID int,
- donatingItem text,
- quantity int,
- geoLocation tuple<double,double>,
- isComplete boolean,
- PRIMARY KEY (donationID)
-);
-
-CREATE TABLE IF NOT EXISTS main.INFORMATION
-(postID text,
- userID int,
- textualInfo text,
- multimediaURL list<text>,
- geoLocation tuple<double,double>,
- PRIMARY KEY (postID)
-);
 
 
 CREATE TABLE IF NOT EXISTS main.MATCHES
