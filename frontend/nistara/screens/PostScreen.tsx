@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, ScrollView } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, ScrollView, RefreshControl } from 'react-native';
 import { dbClient } from '../database/database';
 
 interface Post {
@@ -50,28 +50,36 @@ const PostCard: React.FC<PostCardProps> = (props) => {
 
 const Post: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const database = new dbClient();
 
-  // useEffect(() => {
-  //   const fetchPosts = async () => {
-  //     try {
-  //       const res = await database.getPosts();
-  //       const post_list = res.result as Post[];
-  //       setPosts(post_list);
-  //       console.log(post_list);
-  //     } catch (error) {
-  //       console.error('Error fetching posts: ', error);
-  //     }
-  //   };
+  const fetchPosts = useCallback(async () => {
+    try {
+      const res = await database.getPosts();
+      const post_list = res.result as Post[];
+      setPosts(post_list);
+      console.log(post_list);
+    } catch (error) {
+      console.error('Error fetching posts: ', error);
+    }
+  }, [database]);
 
-  //   const interval = setInterval(fetchPosts, 5000);
-  //   // fetchPosts();
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
-  //   return () => clearInterval(interval);
-  // }, []);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchPosts().then(() => setRefreshing(false));
+  }, [fetchPosts]);
 
   return (
-    <ScrollView style={{ flex: 1 }}>
+    <ScrollView
+      style={{ flex: 1 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {posts.map((post, index) => (
         <PostCard post={post} key={index} />
       ))}

@@ -44,19 +44,19 @@ const HomeScreen = ({navigation}: {navigation:any}) =>{
   // doesn't work
   // const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
 
-  // useEffect(() => {
-  //   const routes = navigation.getState()?.routes;
-  //   console.log(routes)
-  //   const prevRoute = routes[routes.length - 2];
-  //   console.log(prevRoute)
-  //     if (prevRoute==="SignUp") {
-  //         setShowWelcomeMessage(true);
-  //     }
-  // }, [navigation]);
+//   useEffect(() => {
+//     const routes = navigation.getState()?.routes;
+//     console.log(routes)
+//     const prevRoute = routes[routes.length - 2];
+//     console.log(prevRoute)
+//       if (prevRoute==="SignUp") {
+//           setShowWelcomeMessage(true);
+//       }
+//   }, [navigation]);
 
-  // const toggleWelcomeMessage = () => {
-  //     setShowWelcomeMessage(!showWelcomeMessage);
-  // };
+//   const toggleWelcomeMessage = () => {
+//       setShowWelcomeMessage(!showWelcomeMessage);
+//   };
 
 
     return(
