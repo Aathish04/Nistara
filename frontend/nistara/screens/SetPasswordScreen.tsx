@@ -1,14 +1,15 @@
 import React, { useState }from 'react';
-import { StyleSheet, Text, View, Image, BackHandler, TouchableOpacity, TextInput, ActivityIndicator, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ActivityIndicator, ScrollView } from 'react-native';
 import {Ionicons} from '@expo/vector-icons'
 import { images } from '../constants/Images'
 import { sha256 } from 'js-sha256';
 import * as SecureStore from 'expo-secure-store';
+import { dbClient } from '../database/database';
 
 const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>{
     const {userInfo} = route.params
-    // console.log(userInfo)
     const profileImage:any = images[userInfo.profileImage]
+    const client: dbClient = new dbClient()
 
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -26,45 +27,19 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
 
         try {
             let userID: string = sha256(userInfo.maskedNumber + userInfo.email + userInfo.phone + userInfo.dateOfBirth).toString();
-      
             const userPayload = {
               ...userInfo,
               password,
               userID
             };
-
-            console.log(userPayload)
-
             const userPayloadString = JSON.stringify(userPayload);
             await SecureStore.setItemAsync('User', userPayloadString);
             await SecureStore.setItemAsync('stayLoggedIn', 'true');
+            const response = await client.addUser(userPayload);
+            console.log(response)
 
-            const retrieveString = await SecureStore.getItemAsync('User');
-            if (retrieveString) {
-            const userPayload = JSON.parse(retrieveString);
-            console.log(userPayload);
-            }
-
-            const retrieveStatus = await SecureStore.getItemAsync('stayLoggedIn')
-            console.log(retrieveStatus)
-
-            await SecureStore.setItemAsync('stayLoggedIn', 'false');
-            const retrieveStatusNew = await SecureStore.getItemAsync('stayLoggedIn')
-            console.log(retrieveStatusNew)
-
-            await SecureStore.deleteItemAsync('User');
-            const check = await SecureStore.getItemAsync('User');
-            if (check) {
-            const userPayload = JSON.parse(check);
-            console.log(userPayload);
-            }
-            else{
-                console.log("DELETED")
-            }
-
-            await SecureStore.deleteItemAsync('stayLoggedIn');
             setLoading(false);
-            // navigation.navigate("HomeTabs")
+            navigation.navigate("HomeTabs")
         }catch (error) {
             setLoading(false);
             console.error(error);

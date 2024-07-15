@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Text , TouchableOpacity} from 'react-native';
 import { View, StyleSheet  } from 'react-native';
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
@@ -41,10 +41,38 @@ const HomeTopTabs = () =>{
 }
 
 const HomeScreen = ({navigation}: {navigation:any}) =>{
+  // doesn't work
+  // const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
+
+  // useEffect(() => {
+  //   const routes = navigation.getState()?.routes;
+  //   console.log(routes)
+  //   const prevRoute = routes[routes.length - 2];
+  //   console.log(prevRoute)
+  //     if (prevRoute==="SignUp") {
+  //         setShowWelcomeMessage(true);
+  //     }
+  // }, [navigation]);
+
+  // const toggleWelcomeMessage = () => {
+  //     setShowWelcomeMessage(!showWelcomeMessage);
+  // };
+
+
     return(
 
     <View style={styles.container}>
             <HomeTopTabs />
+
+            {/* {showWelcomeMessage && (
+                <TouchableOpacity style={styles.welcomeMessageContainer} onPress={toggleWelcomeMessage}>
+                    <Text style={styles.welcomeMessageText}>
+                        Welcome to Nistara! {'\n'}
+                        We are so happy to have you here 😊
+                    </Text>
+                </TouchableOpacity>
+            )} */}
+
             <TouchableOpacity style={styles.button} onPress={()=>{navigation.navigate("WritePost")}}>
       <Ionicons name="pencil" size={24} color="#fff" />
     </TouchableOpacity>
@@ -74,6 +102,24 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 5,
       },
+      welcomeMessageContainer: {
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          right: 20,
+          backgroundColor: '#fff',
+          padding: 15,
+          borderRadius: 10,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.3,
+          shadowRadius: 3,
+          elevation: 5,
+      },
+      welcomeMessageText: {
+          fontSize: 16,
+          textAlign: 'center',
+      }
   });
 
 export default HomeScreen;

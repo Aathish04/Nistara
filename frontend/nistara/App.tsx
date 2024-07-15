@@ -1,5 +1,4 @@
 import { StatusBar } from 'expo-status-bar';
-// import { StyleSheet, Text, View } from 'react-native';
 
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native'
@@ -11,7 +10,6 @@ import { TouchableOpacity, StyleSheet,Text, View, Image, Alert, Button} from 're
 // For expo-nearby-connections
 import { Buffer } from 'buffer';
 import { startAdvertising, startDiscovery, sanitycheck,requestPermissionsAsync, addOnEndpointConnectedListener, addOnEndpointLostListener, addonPayloadReceivedListener, sendPayload} from './modules/nearby-connections-expo';
-// import { StatusBar } from 'expo-status-bar';
 
 // Splash Screen
 import SplashScreen from './screens/SplashScreen';
@@ -21,6 +19,7 @@ import OnboardingInit from './screens/Onboarding';
 import AadhaarOnboarding from './screens/AadhaarAuth';
 import SignUpScreen from './screens/SignUpScreen';
 import SetPasswordScreen from './screens/SetPasswordScreen';
+import LoginScreen from './screens/LoginScreen';
 
 // Home Bottom Nav Tabs
 import HomeScreen from './screens/HomeScreen';
@@ -28,10 +27,11 @@ import SearchScreen from './screens/SearchScreen';
 import WarningsScreen from './screens/WarningsScreen';
 import DonateScreen from './screens/DonateScreen';
 import SOSScreen from './screens/SOSScreen';
+import WritePost from './screens/WritePost';
 
 // User Profile Screens
 import YourProfileScreen from './screens/YourProfileScreen';
-import WritePost from './screens/WritePost';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -47,6 +47,7 @@ function AuthStack(){
         <Stack.Screen name = "AadhaarOnboarding" component={AadhaarOnboarding} />
         <Stack.Screen name = "SignUp" component = {SignUpScreen} />
         <Stack.Screen name="SetPassword" component = {SetPasswordScreen} />
+        <Stack.Screen name="Login" component={LoginScreen}/>
 
     </Stack.Navigator>
   )

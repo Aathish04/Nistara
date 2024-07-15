@@ -52,23 +52,23 @@ const Post: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const database = new dbClient();
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await database.getPosts();
-        const post_list = res.result as Post[];
-        setPosts(post_list);
-        console.log(post_list);
-      } catch (error) {
-        console.error('Error fetching posts: ', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchPosts = async () => {
+  //     try {
+  //       const res = await database.getPosts();
+  //       const post_list = res.result as Post[];
+  //       setPosts(post_list);
+  //       console.log(post_list);
+  //     } catch (error) {
+  //       console.error('Error fetching posts: ', error);
+  //     }
+  //   };
 
-    const interval = setInterval(fetchPosts, 5000);
-    fetchPosts();
+  //   const interval = setInterval(fetchPosts, 5000);
+  //   // fetchPosts();
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   return (
     <ScrollView style={{ flex: 1 }}>

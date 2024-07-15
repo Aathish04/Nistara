@@ -165,4 +165,23 @@ export class dbClient {
       return { message: 'Failed: User sign up' };
     }
   }
+
+  async getUser(email: string, password: string){
+    try{
+      const query: string= `SELECT * from main.users WHERE email = '${email}' ALLOW FILTERING;`
+      const headers = {
+        'Content-Type': 'text/plain',
+        'X-Cassandra-Token': ASTRA_DB_APPLICATION_TOKEN,
+      }
+      let response = await axios.post(`${ASTRA_BASE_URL}/api/rest/v2/cql?keyspaceQP=${ASTRA_DB_KEYSPACE}`, query, {headers})
+      // console.log(response)
+      const userData = response.data.data[0]
+      if(userData.password === password) return { message: 'Valid User', user: userData}
+      else return { message: 'Invalid Credentials. Please try again.'}
+    }catch(e){
+      console.error('User not found', e);
+      return {message: 'Invalid Credentials. Please try again.'}
+    }
+
+  }
 }
