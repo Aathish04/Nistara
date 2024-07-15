@@ -109,7 +109,12 @@ def putExtractedInformation(extracted_info, post_data):
             donationid = result.hexdigest()
             
             item_name = item['itemName']
-            quantity = item['quantity']
+            
+            if item['quantity']:
+                quantity = int(item['quantity']) or None
+            else:
+                quantity = None
+                
             
             prepared = session.prepare("INSERT INTO main.donation (donationid, donatingitem, geolocation, iscomplete, postid, quantity, userid, username, profilephoto, timestamp, textualinfo, class) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
             session.execute(prepared, (str(donationid), item_name, geolocation, False, postid, quantity, str(userid), username, profilephoto, timestamp, textualinfo, category))
@@ -139,9 +144,13 @@ def putExtractedInformation(extracted_info, post_data):
             requestid = result.hexdigest()
             
             item_name = item['itemName']
-            quantity = int(item['quantity'])
             class_ = item['class']
-            
+
+            if item['quantity']:
+                quantity = int(item['quantity']) or None
+            else:
+                quantity = None
+
             prepared = session.prepare("INSERT INTO main.requests (requestid, requesttype, postid, userid, item, quantity, class, geolocation, iscomplete, username, profilephoto, timestamp, textualinfo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
             session.execute(prepared, (requestid, category, postid, userid, item_name, quantity, class_, geolocation, False, username, profilephoto, timestamp, textualinfo))
             logger.info(f"Inserted item request: {requestid}")
