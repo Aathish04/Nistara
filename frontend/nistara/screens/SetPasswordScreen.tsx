@@ -1,10 +1,11 @@
 import React, { useState }from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ActivityIndicator, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ActivityIndicator, ScrollView, SafeAreaView } from 'react-native';
 import {Ionicons} from '@expo/vector-icons'
 import { images } from '../constants/Images'
 import { sha256 } from 'js-sha256';
 import * as SecureStore from 'expo-secure-store';
 import { dbClient } from '../database/database';
+import SafeViewAndroid from '../components/SafeViewAndroid';
 
 const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>{
     const {userInfo} = route.params
@@ -46,51 +47,58 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
           }
     }
     return(
-        <View style={styles.container}>
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.goBack()}
-                >
-                <Ionicons name="chevron-back" size={24} color="black" />
-            </TouchableOpacity>
+        <SafeAreaView style={SafeViewAndroid.AndroidSafeArea}>
+            <View style={styles.container}>
             <View style={styles.header}>
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => navigation.goBack()}
+                    >
+                    <Ionicons name="chevron-back" size={24} color="black" />
+                </TouchableOpacity>
                 <View style={styles.circleView}></View>
                 <Image source = {profileImage} style={styles.avatar}/>
-                <Text style={styles.headerText}>{userInfo.userName}</Text>
+                <View style={styles.headerContent}>
+                    <Text style={styles.headerText}>{userInfo.userName}</Text>
+                </View>
             </View>
-            <View style={styles.contactSection}>
-                    <Ionicons name="mail-open" size={24} color="#ccc"/>
-                    <Text style={styles.contactInfo}>{userInfo.email}</Text>
+            <View style={styles.content}>
+                <View style={styles.contactSection}>
+                        <Ionicons name="mail-open" size={24} color="#ccc"/>
+                        <Text style={styles.contactInfo}>{userInfo.email}</Text>
+                </View>
+                <ScrollView>
+                    <Text style={styles.passwordMessage}>Create a strong password to keep your account secure.</Text>
+                    <View style={styles.inputSection}>
+                        <Text style={styles.label}>Password</Text>
+                        <TextInput
+                        placeholder="Enter Password"
+                        secureTextEntry
+                        style={styles.input}
+                        value={password}
+                        onChangeText={setPassword}
+                        />
+                        <Text style={styles.label}>Confirm Password</Text>
+                        <TextInput
+                        placeholder="Confirm Password"
+                        secureTextEntry
+                        style={styles.input}
+                        value={confirmPassword}
+                        onChangeText={(text) => {
+                            setConfirmPassword(text);
+                            if (text !== password) {
+                            setErrorMessage('Passwords do not match');
+                            } else {
+                            setErrorMessage('');
+                            }
+                        }}
+                        />
+                        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+                        <Text style={styles.infoText}>You can sign in to your account with your registered email and password.</Text>     
+                    </View>
+                </ScrollView>
             </View>
-            <ScrollView>
-            <Text style={styles.passwordMessage}>Create a strong password to keep your account secure.</Text>
-            <View style={styles.inputSection}>
-                <Text style={styles.label}>Password</Text>
-                <TextInput
-                placeholder="Enter Password"
-                secureTextEntry
-                style={styles.input}
-                value={password}
-                onChangeText={setPassword}
-                />
-                <Text style={styles.label}>Confirm Password</Text>
-                <TextInput
-                placeholder="Confirm Password"
-                secureTextEntry
-                style={styles.input}
-                value={confirmPassword}
-                onChangeText={(text) => {
-                    setConfirmPassword(text);
-                    if (text !== password) {
-                      setErrorMessage('Passwords do not match');
-                    } else {
-                      setErrorMessage('');
-                    }
-                }}
-                />
-                {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-                <Text style={styles.infoText}>You can sign in to your account with your registered email and password</Text>
-                
+            <View style={{alignItems: 'center'}}>
                 {loading ? (
                     <ActivityIndicator size="large" color="#95A8EF" />
                 ) : (
@@ -98,61 +106,67 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
                         <Text style={styles.buttonText}>Create Your Account!</Text>
                     </TouchableOpacity>
                 )}
+            </View>
             
                 
-            </View>
-            </ScrollView>
+
+            
         </View>
+        </SafeAreaView>
     )
 }
 
 export default SetPasswordScreen;
 
 const styles = StyleSheet.create({
-    container:{
-        flex:1,
-        backgroundColor: "#fff",
-        paddingTop: 60,
-        padding: 20
+    container: {
+        paddingTop: 30,
+        paddingHorizontal: 10,
+        paddingBottom: 20
     },
-    header:{
+      header: {
         flexDirection: "row",
-        marginTop: -100,
-        marginLeft: -40
-    },
-    backButton:{
-        zIndex:2
+        paddingHorizontal: 10
     },
     circleView:{
-        marginLeft: -80,
-        marginTop: -50,
+        marginLeft: -140,
+        marginTop: -120,
         backgroundColor: "#95A8EF",
         borderRadius: 300,
         width: 250,
         height: 255,
-        opacity: 0.3
+        opacity: 0.4
+    },
+    backButton:{
+        zIndex:2
     },
     avatar:{
         zIndex: 1,
         borderRadius: 100,
-        width: 115,
-        height: 115,
-        marginTop: 90,
-        marginLeft: -75
+        width: 105,
+        height: 105,
+        marginLeft: -70,
+        top: 5
+    },
+    headerContent:{
+        flexDirection: "column",
+        width: 220,
+        paddingLeft: 20,
+        paddingVertical: 30,
+        paddingRight: 10
     },
     headerText:{
-        fontSize: 28,
+        fontSize: 22,
         fontWeight: "bold",
-        marginTop: 90,
-        marginLeft: 45,
-        color: "#95A8EF",
-        flexWrap: 'wrap',
-        width: 200
+        color: "#95A8EF"
+    },
+    content:{
+        paddingHorizontal: 15,
+        paddingVertical: 50
     },
     contactSection:{
         flexDirection: "row",
-        paddingBottom: 15,
-        paddingTop: 50
+        paddingBottom: 10   
     },
     contactInfo:{
         color: "#959595",
@@ -175,14 +189,12 @@ const styles = StyleSheet.create({
         paddingBottom: 14,
         paddingVertical: 14,
         borderColor: '#95A8EF',
+        backgroundColor: '#95A8EF',
         borderWidth: 2,
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        width: "90%",
-        marginTop: 60,
-        marginLeft: 18,
-        backgroundColor: '#95A8EF'
+        width: "90%"
     },
     buttonText: {
         color: "#fff",
@@ -190,9 +202,8 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     passwordMessage:{
-        fontWeight: "bold",
-        fontSize: 18
-
+        fontSize: 16,
+        fontWeight: "condensedBold"
     },
     infoText:{
         color: "#959595",
@@ -202,11 +213,10 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: 'red',
-        marginBottom: 15,
+        marginBottom: 10,
     },
     label:{
-        marginBottom: 15,
-        fontSize: 16,
-        fontWeight: "bold"
+        paddingBottom: 10,
+        fontSize: 16
     }
 })

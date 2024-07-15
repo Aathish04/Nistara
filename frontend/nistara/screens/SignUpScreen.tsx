@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, BackHandler, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, SafeAreaView } from 'react-native';
 import {Ionicons} from '@expo/vector-icons'
-import { aadhaarInfo } from '../data';
+import SafeViewAndroid from '../components/SafeViewAndroid';
+// import { aadhaarInfo } from '../data';
 
 type Address = {
     careOf: string;
@@ -98,9 +99,9 @@ const constructPayload = (aadhaar: Aadhaar, userName:string, formattedAddress:Ad
   
 
 const SignUpScreen = ({route, navigation}:{route:any, navigation:any})=>{
-    // const {aadhaarInfo, email, phone} = route.params
-    const email = "example@gmail.com"
-    const phone = "1234567890"
+    const {aadhaarInfo, email, phone} = route.params
+    // const email = "example@gmail.com"
+    // const phone = "1234567890"
     const userName = getUserNameFormatted(aadhaarInfo.name)
     const displayAddress = getAddressToDisplayFormatted(aadhaarInfo.address);
     // console.log(constructPayload(aadhaarInfo, userName, displayAddress, email, phone))
@@ -112,8 +113,8 @@ const SignUpScreen = ({route, navigation}:{route:any, navigation:any})=>{
     }
 
     return(
+        <SafeAreaView style={SafeViewAndroid.AndroidSafeArea}>
         <View style={styles.container}>
-            <Ionicons name="chevron-back" size={30} color="#000"/>
             <View style={styles.header}>
                 <View style={styles.circleView}></View>
                 <Image source={{ uri: 'data:image/jpeg;base64,'+aadhaarInfo.photo }} style={styles.aadhaarPhoto} />
@@ -171,34 +172,35 @@ const SignUpScreen = ({route, navigation}:{route:any, navigation:any})=>{
                     </View>
                 </View>
             </View>
-            <TouchableOpacity
-            style={{
-                ...styles.button,
-                ...{ backgroundColor: '#95A8EF'},
-            }}
-            onPress = {handlePress}
-            >
-            <Text style={{ fontSize: 18, ... { color: '#FFFFFF' } }}>Confirm</Text>
-        </TouchableOpacity>
+            <View style={{alignItems: 'center', paddingTop: 30}}>
+                <TouchableOpacity
+                style={{
+                    ...styles.button,
+                    ...{ backgroundColor: '#95A8EF'},
+                }}
+                onPress = {handlePress}
+                >
+                <Text style={{ fontSize: 18, ... { color: '#FFFFFF' } }}>Confirm</Text>
+                </TouchableOpacity>
+            </View>
         </View>
+        </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
-    container:{
-        flex:1,
-        backgroundColor: "#fff",
-        paddingTop: 60,
-        paddingLeft: 20
-    },
-    header:{
+    container: {
+        paddingTop: 30,
+        paddingHorizontal: 10,
+        paddingBottom: 20
+      },
+      header: {
         flexDirection: "row",
-        marginTop: -100,
-        marginLeft: -40
-    },
+        paddingHorizontal: 10
+      },
     circleView:{
-        marginLeft: -80,
-        marginTop: -50,
+        marginLeft: -140,
+        marginTop: -120,
         backgroundColor: "#95A8EF",
         borderRadius: 300,
         width: 250,
@@ -208,32 +210,33 @@ const styles = StyleSheet.create({
     aadhaarPhoto:{
         zIndex: 1,
         borderRadius: 100,
-        width: 115,
-        height: 115,
-        marginTop: 80,
-        marginLeft: -75
+        width: 105,
+        height: 105,
+        marginLeft: -70,
+        top: 5
     },
     headerText:{
         fontSize: 28,
         fontWeight: "bold",
-        marginTop: 90,
-        marginLeft: 25,
         color: "#95A8EF"
     },
     userNameText:{
-        marginLeft: 25,
         fontSize: 22,
         paddingTop: 5,
         flexWrap: 'wrap',
-        width: 200
+        fontWeight: "condensedBold"
     },
     headerContent:{
-        flexDirection: "column"
+        flexDirection: "column",
+        width: 220,
+        paddingLeft: 25,
+        paddingVertical: 10,
+        paddingRight: 10
     },
     userDetails:{
         flexDirection: "column",
-        marginTop: 50,
-        marginLeft: 20
+        paddingTop: 50,
+        paddingHorizontal: 20
     },
     contactSection:{
         flexDirection: "row",
@@ -241,11 +244,12 @@ const styles = StyleSheet.create({
     },
     contactInfo:{
         color: "#959595",
-        marginLeft: 20,
-        fontWeight: "bold"
+        marginLeft: 25,
+        fontWeight: "bold",
+        fontSize: 15
     },
     section:{
-        paddingTop: 20
+        paddingVertical: 20
     },
     sectionHeader:{
         flexDirection: "row"
@@ -253,7 +257,7 @@ const styles = StyleSheet.create({
     sectionHeaderTitle:{ 
         paddingLeft: 25,
         fontSize: 18,
-        fontWeight: "500"
+        fontWeight: "bold"
     },
     sectionContent:{
         paddingTop: 5,
@@ -273,9 +277,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        width: "90%",
-        marginTop: 140,
-        marginLeft: 10
+        width: "90%"
     }
 })
 

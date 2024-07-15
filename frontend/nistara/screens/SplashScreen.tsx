@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, Pressable, SafeAreaView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -48,41 +48,23 @@ const SplashScreen = ({ navigation }: { navigation: any }) => {
       <Image
         source={require("../assets/splash/logo.jpg")}
       />
-
       <View style={styles.textContainer}>
         <Text style={styles.title}>Welcome to Nistara</Text>
         <Text style={styles.subtitle}>
           Empowering Communities, Saving Lives
         </Text>
       </View>
-
-      <TouchableOpacity
-            style={{
-                ...styles.button,
-                ...{ backgroundColor: '#FFFFFF'},
-                ...styles.howItWorksButton
-            }}
-            onPress = {()=>{navigation.navigate("Auth", {screen: "OnboardingInit"})}}
-            >
-            <Text style={{ fontSize: 18, ... { color: '#95A8EF' } }}>Learn how it works</Text>
-        </TouchableOpacity>
-        <View style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                marginVertical: 22
-            }}>
-                <Text style={{ fontSize: 16, color:"#fff" }}>Already have an account? </Text>
-                <Pressable
-                    onPress={() => navigation.navigate("Auth", {screen: "Login"})}
-                >
-                    <Text style={{
-                        fontSize: 16,
-                        color: "#fff",
-                        fontWeight: "bold",
-                        marginLeft: 6
-                    }}>Log In</Text>
-                </Pressable>
-          </View>
+      <TouchableOpacity style={styles.button}
+            onPress = {()=>{navigation.navigate("Auth", {screen: "OnboardingInit"})}}>
+            <Text style={styles.buttonText}>Learn how it works</Text>
+      </TouchableOpacity>
+      <View style={styles.loginContainer}>
+              <Text style={{ fontSize: 16, color:"#fff" }}>Already have an account? </Text>
+              <Pressable
+                  onPress={() => navigation.navigate("Auth", {screen: "Login"})}>
+                  <Text style={styles.loginText}>Log In</Text>
+              </Pressable>
+      </View>
     </LinearGradient>
   );
 };
@@ -91,13 +73,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 22,
+    paddingHorizontal: 22,
   },
   textContainer: {
     width: "95%",
     alignItems: "center",
-    marginBottom: 90,
-    marginTop: 55
+    paddingBottom: 175,
+    paddingTop: 55
   },
   title: {
     fontSize: 32,
@@ -111,10 +93,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "center",
   },
-  howItWorksButton: {
-    width: "95%",
-    marginTop: 120, // Aathish says Hi
-  },
   button: {
     paddingBottom: 14,
     paddingVertical: 14,
@@ -122,8 +100,25 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 10,
     alignItems: 'center',
-    justifyContent: 'center'
-}
+    justifyContent: 'center',
+    width: "95%",
+    backgroundColor: '#FFFFFF'
+  },
+  buttonText:{
+    color: "#95A8EF",
+    fontSize: 18
+  },
+  loginContainer:{
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 20
+  },
+  loginText:{
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "bold",
+    marginLeft: 6
+  }
 });
 
 export default SplashScreen;

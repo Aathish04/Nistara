@@ -70,8 +70,9 @@ const LoginScreen = ({navigation}: {navigation: any}) =>{
                 >
                 <Ionicons name="chevron-back" size={24} color="black" />
                 </TouchableOpacity>
+                <Text style={styles.headerText}>Log In</Text>
             </View>
-            <Text style={styles.headerText}>Log In</Text>
+            
             <View style={styles.inputSection}>
                 <Text style={styles.label}>Email</Text>
                 <TextInput
@@ -156,8 +157,7 @@ const styles = StyleSheet.create({
     headerText: {
         fontSize: 24,
         fontWeight: 'bold',
-        paddingHorizontal: 20,
-        paddingTop: 10
+        padding: 20
     },
     inputSection: {
         paddingHorizontal: 20,
