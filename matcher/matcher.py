@@ -128,6 +128,7 @@ def getAndMatchAllRequests():
 
 
 if __name__ == "__main__":
-    model = SentenceTransformer('./all-mpnet-base-v2')
+    model = SentenceTransformer('all-mpnet-base-v2',cache_folder='.')
+
     while True:
         getAndMatchAllRequests()
