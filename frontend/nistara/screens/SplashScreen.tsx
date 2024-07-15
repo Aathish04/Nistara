@@ -3,44 +3,47 @@ import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
+import { useFocusEffect } from '@react-navigation/native';
 
 const SplashScreen = ({ navigation }: { navigation: any }) => {
   const [isAuthenticating, setIsAuthenticating] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  useEffect(() => {
-    const authenticate = async () => {
-      setTimeout(async () => {
-        try{
-          const user = await SecureStore.getItemAsync('User');
-          const stayLoggedIn = await SecureStore.getItemAsync('stayLoggedIn');
-          
-          // if user has signed up and chose to stay logged in
-          if (user && stayLoggedIn === 'true'){
-            const compatible = await LocalAuthentication.hasHardwareAsync();
-            if (compatible) {
-              const enrolled = await LocalAuthentication.isEnrolledAsync();
-              if (enrolled) {
-                const auth = await LocalAuthentication.authenticateAsync({
-                promptMessage: 'Unlock Nistara',
-                fallbackLabel: 'Enter Pattern or Password', // isn't really supported lol, but anyway
-                });
-                if (auth.success) { // yay case
-                setIsAuthenticated(true);
-                navigation.navigate("HomeTabs"); // go straight to home 
-                } else return // Auth failed
-              } else return // No Biometrics Found: Set up biometrics to use this feature
-            } else return // Biometrics Not Supported: Device does not support biometric authentication
-          } else setIsAuthenticating(false); // user should sign up or has logged out and wants to log in
-        }catch(error){
-          console.error(error)
-          setIsAuthenticated(false)
-        }
-        setIsAuthenticating(false);
-      }, 1000); // delay for 3s, worked hard on the splash screen, want people to see it every damn time uwu
-    };
-    authenticate();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const authenticate = async () => {
+        setTimeout(async () => {
+          try {
+            const user = await SecureStore.getItemAsync('User');
+            const stayLoggedIn = await SecureStore.getItemAsync('stayLoggedIn');
+            
+            // if user has signed up and chose to stay logged in
+            if (user && stayLoggedIn === 'true'){
+              const compatible = await LocalAuthentication.hasHardwareAsync();
+              if (compatible) {
+                const enrolled = await LocalAuthentication.isEnrolledAsync();
+                if (enrolled) {
+                  const auth = await LocalAuthentication.authenticateAsync({
+                  promptMessage: 'Unlock Nistara',
+                  fallbackLabel: 'Enter Pattern or Password', // isn't really supported lol, but anyway
+                  });
+                  if (auth.success) { // yay case
+                  setIsAuthenticated(true);
+                  navigation.navigate("HomeTabs"); // go straight to home 
+                  } else return // Auth failed
+                } else return // No Biometrics Found: Set up biometrics to use this feature
+              } else return // Biometrics Not Supported: Device does not support biometric authentication
+            } else setIsAuthenticating(false); // user should sign up or has logged out and wants to log in
+          } catch(error) {
+            console.error(error)
+            setIsAuthenticated(false)
+          }
+          setIsAuthenticating(false);
+        }, 1000); // delay for 1s, worked hard on the splash screen, want people to see it every damn time uwu
+      };
+      authenticate();
+    }, [])
+  );
 
  
   return (
