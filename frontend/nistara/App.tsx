@@ -7,6 +7,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons,SimpleLineIcons } from "@expo/vector-icons";
 import { TouchableOpacity, StyleSheet,Text, View, Image, Alert, Button} from 'react-native';
 
+// get currently logged in user details
+import { UserProvider } from './components/UserContext';
+import { useUser } from './components/UserContext';
+
+// for profile image
+import { images } from './constants/Images';
+
 // For expo-nearby-connections
 import { Buffer } from 'buffer';
 import { startAdvertising, startDiscovery, sanitycheck,requestPermissionsAsync, addOnEndpointConnectedListener, addOnEndpointLostListener, addonPayloadReceivedListener, sendPayload} from './modules/nearby-connections-expo';
@@ -54,6 +61,13 @@ function AuthStack(){
 }
 
 function HomeTabs({navigation}:{navigation:any}){
+
+  const { userID, userName, profileImage } = useUser();
+  let userAvatar: any;
+  if (profileImage) userAvatar = images[profileImage]
+  else userAvatar = require('./assets/profile/dog.png')
+
+
   return(
   <>
       <View style={{
@@ -69,7 +83,7 @@ function HomeTabs({navigation}:{navigation:any}){
         <Text style={{fontSize: 22, fontWeight: "500"}}>Nistara</Text>
         <TouchableOpacity onPress = {()=>{navigation.navigate("Profile")}}>
           <Image
-            source={require("./assets/profile/dog.png")}
+            source={userAvatar}
             style={{
               width: 35,
               height: 35,
@@ -204,40 +218,43 @@ export default function App() {
   }
 
   let actualview = (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="SplashScreen"
-          component={SplashScreen}
-          options = {{headerShown: false}}
-        />
-        <Stack.Screen
-            name="Auth"
-            component={AuthStack}
+
+    <UserProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="SplashScreen"
+            component={SplashScreen}
+            options = {{headerShown: false}}
+          />
+          <Stack.Screen
+              name="Auth"
+              component={AuthStack}
+              options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="HomeTabs"
+            component={HomeTabs}
             options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="HomeTabs"
-          component={HomeTabs}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="SOSScreen"
-          component={SOSScreen}
-          options={{ headerShown: false}}
-        />
-        <Stack.Screen 
-          name="Profile"
-          component={YourProfileScreen}
-          options= {{ headerShown: false}}
-        />
-         <Stack.Screen 
-          name="WritePost"
-          component={WritePost}
-          options= {{ headerShown: false}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+          />
+          <Stack.Screen
+            name="SOSScreen"
+            component={SOSScreen}
+            options={{ headerShown: false}}
+          />
+          <Stack.Screen 
+            name="Profile"
+            component={YourProfileScreen}
+            options= {{ headerShown: false}}
+          />
+          <Stack.Screen 
+            name="WritePost"
+            component={WritePost}
+            options= {{ headerShown: false}}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserProvider>
   );
   let meshtestview = (
     <View style={styles.container}>
