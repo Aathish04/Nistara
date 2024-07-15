@@ -37,7 +37,7 @@ const SplashScreen = ({ navigation }: { navigation: any }) => {
           setIsAuthenticated(false)
         }
         setIsAuthenticating(false);
-      }, 3000); // delay for 3s, worked hard on the splash screen, want people to see it every damn time uwu
+      }, 1000); // delay for 3s, worked hard on the splash screen, want people to see it every damn time uwu
     };
     authenticate();
   }, []);
