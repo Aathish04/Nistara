@@ -33,6 +33,8 @@ cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
 session = cluster.connect()
 session.row_factory = dict_factory
 
+UNSET_MATCHER_ID = UNSET_CLASSIFIER_ID = -1
+
 logger.info("Connected to Cassandra cluster.")
 
 def insertData():
@@ -42,15 +44,15 @@ def insertData():
 
     # Data to be inserted
     posts = [
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user1', None, -1, (37.7749, -122.4194), False, ['url1'], 'Request for food and water supplies to assist affected families.', datetime.utcnow(), None),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user2', None, -1, (29.7604, -95.3698), False, ['url2'], 'Urgent need for hygiene products including soap and sanitizers.', datetime.utcnow(), None),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user3', None, -1, (40.7128, -74.0060), False, ['url3'], 'Emergency lighting and communication devices needed for affected areas.', datetime.utcnow(), None),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user4', None, -1, (34.0522, -118.2437), False, ['url4'], 'Request for medicines and first aid kits.', datetime.utcnow(), 'MEDICINE'),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user5', None, -1, (37.7749, -122.4194), False, ['url5'], 'Need tools and equipment for debris removal and rescue operations.', datetime.utcnow(), None),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user6', None, -1, (34.0522, -118.2437), False, ['url6'], 'Request for clothing and shelter materials for displaced persons.', datetime.utcnow(), None),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user7', None, -1, (40.7128, -74.0060), False, ['url7'], 'Safety and protection gear required for volunteers.', datetime.utcnow(), None),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user8', None, -1, (37.7749, -122.4194), False, ['url8'], 'Request for evacuation assistance for elderly residents.', datetime.utcnow(), None),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, -1, (29.7604, -95.3698), False, ['url9'], 'Searching for missing person: John Doe, last seen near the river.', datetime.utcnow(), None),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user1', None, UNSET_CLASSIFIER_ID, (37.7749, -122.4194), False, ['url1'], 'Request for food and water supplies to assist affected families.', datetime.utcnow(), None),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user2', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url2'], 'Urgent need for hygiene products including soap and sanitizers.', datetime.utcnow(), None),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user3', None, UNSET_CLASSIFIER_ID, (40.7128, -74.0060), False, ['url3'], 'Emergency lighting and communication devices needed for affected areas.', datetime.utcnow(), None),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user4', None, UNSET_CLASSIFIER_ID, (34.0522, -118.2437), False, ['url4'], 'Request for medicines and first aid kits.', datetime.utcnow(), 'MEDICINE'),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user5', None, UNSET_CLASSIFIER_ID, (37.7749, -122.4194), False, ['url5'], 'Need tools and equipment for debris removal and rescue operations.', datetime.utcnow(), None),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user6', None, UNSET_CLASSIFIER_ID, (34.0522, -118.2437), False, ['url6'], 'Request for clothing and shelter materials for displaced persons.', datetime.utcnow(), None),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user7', None, UNSET_CLASSIFIER_ID, (40.7128, -74.0060), False, ['url7'], 'Safety and protection gear required for volunteers.', datetime.utcnow(), None),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user8', None, UNSET_CLASSIFIER_ID, (37.7749, -122.4194), False, ['url8'], 'Request for evacuation assistance for elderly residents.', datetime.utcnow(), None),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'Searching for missing person: John Doe, last seen near the river.', datetime.utcnow(), None),
     ]
 
     for post in posts:
@@ -109,10 +111,10 @@ def putExtractedInformation(extracted_info, post_data):
             donationid = result.hexdigest()
             
             item_name = item['itemName']
-            quantity = item['quantity']
+            quantity = int(item['quantity'])
             
-            prepared = session.prepare("INSERT INTO main.donation (donationid, donatingitem, geolocation, iscomplete, postid, quantity, userid, username, profilephoto, timestamp, textualinfo, class) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
-            session.execute(prepared, (str(donationid), item_name, geolocation, False, postid, quantity, str(userid), username, profilephoto, timestamp, textualinfo, category))
+            prepared = session.prepare("INSERT INTO main.donation (donationid, matcherid, donatingitem, geolocation, iscomplete, postid, quantity, userid, username, profilephoto, timestamp, textualinfo, class) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
+            session.execute(prepared, (str(donationid), UNSET_MATCHER_ID, item_name, geolocation, False, postid, quantity, str(userid), username, profilephoto, timestamp, textualinfo, item['class']))
             logger.info(f"Inserted donation: {donationid}")
 
     elif category == 'REQUEST_EVACUATION':
@@ -142,8 +144,8 @@ def putExtractedInformation(extracted_info, post_data):
             quantity = int(item['quantity'])
             class_ = item['class']
             
-            prepared = session.prepare("INSERT INTO main.requests (requestid, requesttype, postid, userid, item, quantity, class, geolocation, iscomplete, username, profilephoto, timestamp, textualinfo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
-            session.execute(prepared, (requestid, category, postid, userid, item_name, quantity, class_, geolocation, False, username, profilephoto, timestamp, textualinfo))
+            prepared = session.prepare("INSERT INTO main.requests (requestid, matcherid ,requesttype, postid, userid, item, quantity, class, geolocation, iscomplete, username, profilephoto, timestamp, textualinfo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
+            session.execute(prepared, (requestid, UNSET_MATCHER_ID, category, postid, userid, item_name, quantity, class_, geolocation, False, username, profilephoto, timestamp, textualinfo))
             logger.info(f"Inserted item request: {requestid}")
 
     update_query = f"UPDATE main.posts SET isclassified = ?, tag = ? WHERE postid = ?;"

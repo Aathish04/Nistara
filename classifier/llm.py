@@ -18,6 +18,8 @@ genai.configure(api_key=LLM_API_KEY)
 
 logger.info("Configured Google Generative AI with provided API key.")
 
+ITEM_CLASSES = ["FOOD_AND_WATER", "EMERGENCY_LIGHTING_AND_COMMUNICATION", "HYGIENE", "TOOLS_AND_EQUIPMENT", "CLOTHING_AND_SHELTER", "SAFETY_AND_PROTECTION"]
+POST_CATEGORIES = ["REQUEST_ITEM", "REQUEST_EVACUATION", "REQUEST_SEARCH", "OFFER", "INFORMATION"]
 post_schema = glm.Schema(
     type=glm.Type.OBJECT,
     properties={
@@ -30,7 +32,7 @@ post_schema = glm.Schema(
                     "quantity": glm.Schema(type=glm.Type.INTEGER),
                     "class": glm.Schema(
                         type=glm.Type.STRING,
-                        enum=["FOOD_AND_WATER", "EMERGENCY_LIGHTING_AND_COMMUNICATION", "HEALTH_AND_HYGIENE", "TOOLS_AND_EQUIPMENT", "ENTERTAINMENT", "CLOTHING_AND_SHELTER", "SAFETY_AND_PROTECTION"],
+                        enum=ITEM_CLASSES,
                         format="enum"
                     )
                 }
@@ -38,7 +40,7 @@ post_schema = glm.Schema(
         ),
         "category": glm.Schema(
             type=glm.Type.STRING,
-            enum=["REQUEST_ITEM", "REQUEST_EVACUATION", "REQUEST_SEARCH", "OFFER", "INFORMATION"],
+            enum=POST_CATEGORIES,
             format="enum"
         ),
     },
@@ -79,20 +81,10 @@ def extract_event_data_from_post(post):
     text_image_describe_prompt = f"""
     You are an information extraction system. Your task is to extract information from a given post and categorize it accordingly. The possible categories for the post are:
 
-REQUEST_ITEM
-REQUEST_EVACUATION
-REQUEST_SEARCH
-OFFER
-INFORMATION
+{'\n'.join(POST_CATEGORIES)}
 For each item extracted from the post, assign it to one of the following classes:
 
-FOOD_AND_WATER
-EMERGENCY_LIGHTING_AND_COMMUNICATION
-HYGIENE
-MEDICINE
-TOOLS_AND_EQUIPMENT
-CLOTHING_AND_SHELTER
-SAFETY_AND_PROTECTION
+{'\n'.join(ITEM_CLASSES)}
 The post details are given by {post}. Your task is to:
 
 Identify the category of the post.
