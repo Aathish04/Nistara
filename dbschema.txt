@@ -1,67 +1,93 @@
 CREATE TABLE main.posts (
-    postid text PRIMARY KEY,
+    id text PRIMARY KEY,
+    geolocation frozen<tuple<double, double>>,
+    multimediaurl list<text>,
+    textcontent text,
+    timestamp timestamp,
+    lastupdatetimestamp timestamp,
+
     userid text,
     username text,
     profilephoto text,
+    language text,
+
     classifier int,
-    geolocation frozen<tuple<double, double>>,
     isclassified boolean,
-    multimediaurl list<text>,
-    textualinfo text,
-    timestamp timestamp,
-    tag text
+    class text,
+
+    translator int,
+    istranslated text,
+    translatedtextcontent text
 )
 
 CREATE TABLE main.requests (
-    requestid text PRIMARY KEY,
-    requesttype text,
-    class text,
-    geolocation frozen<tuple<double, double>>,
-    iscomplete boolean,
+    id text PRIMARY KEY,
+    umbrellatype text,
     item text,
     quantity int,
-    postid text
+    
+    postid text,
+    geolocation frozen<tuple<double, double>>,
+    translatedtextcontent text,
+    timestamp timestamp,
+    postclass text,
+    
     userid text,
     username text,
     profilephoto text,
-    timestamp timestamp,
-    textualinfo text
+    
+    matcherid int,
+    ismatched boolean
 )
 
 
-CREATE TABLE main.donation (
-    donationid text PRIMARY KEY,
-    donatingitem text,
-    geolocation frozen<tuple<double, double>>,
-    iscomplete boolean,
-    postid text,
+CREATE TABLE main.donations (
+    id text PRIMARY KEY,
+    umbrellatype text,
+    item text,
     quantity int,
+
+    postid text
+    geolocation frozen<tuple<double, double>>,
+    translatedtextcontent text,
+    timestamp timestamp,
+    postclass text,
+
     userid text,
     username text,
     profilephoto text,
-    timestamp timestamp,
-    textualinfo text,
-    class text
+
+    matcherid int,
+    ismatched boolean
 );
 
-
-
-CREATE TABLE IF NOT EXISTS main.MATCHES
-(requestID text,
- donationID text,
- matcherID int,
- PRIMARY KEY ((requestID,donationID))
+CREATE TABLE main.MATCHES(
+    requestID text,
+    donationID text,
+    matcherID int,
+    matchtime timestamp,
+    requesterAck boolean,
+    donorAck boolean,
+    PRIMARY KEY ((requestID,donationID))
 );
 
 CREATE TABLE IF NOT EXISTS main.USERS
-(userID int,
- userName text,
- phoneNumber text,
- address text,
- geoLocation tuple<double,double>,
- profileImage text,
- maskedAadhar text,
- PRIMARY KEY (userID)
+(
+    id text PRIMARY KEY,
+    name text,
+    phoneNumber text,
+    address text,
+    language text,
+    geoLocation tuple<double,double>,
+    profileImage text,
+    maskedAadhar text,
 );
 
-yet to add matcher table
+CREATE TABLE main.INSTANCES(
+    id int PRIMARY KEY,
+    type string,
+    userid string,
+    name text,
+    phoneNumber text,
+    address text
+)
