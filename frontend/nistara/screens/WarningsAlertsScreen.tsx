@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
-import MapView, { Marker } from 'react-native-maps';
-import { Ionicons} from "@expo/vector-icons";
+import { WebView } from 'react-native-webview';
+import { Ionicons } from "@expo/vector-icons";
 
 interface Alert {
   severity: string;
@@ -23,7 +23,6 @@ interface Alert {
   area_covered: string;
   sender_org_id: string;
 }
-
 
 const WarningsAlertsScreen: React.FC = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -84,93 +83,129 @@ const WarningsAlertsScreen: React.FC = () => {
     return `${day}, ${month} ${date} ${year}, ${time} hrs`;
   };
 
+  const generateHtmlContent = () => {
+    const userCoords = userLocation
+      ? `${userLocation.coords.latitude}, ${userLocation.coords.longitude}`
+      : '20.5937, 78.9629';
+
+    const markers = alerts.map(alert => {
+      const [longitude, latitude] = alert.centroid.split(',').map(Number);
+      return `{
+        position: { lat: ${latitude}, lng: ${longitude} },
+        severityColor: "${alert.severity_color}"
+      }`;
+    }).join(',');
+
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>TomTom Map</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <script src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.14.0/maps/maps-web.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.14.0/maps/maps.css"/>
+        <style>
+          #map {
+            height: 100%;
+            width: 100%;
+          }
+        </style>
+      </head>
+      <body>
+        <div id="map"></div>
+        <script>
+          var map = tt.map({
+            key: 'IpZWkH0yM2SsymlhplbeLqMrAuBc3mZd',
+            container: 'map',
+            center: [${userCoords}],
+            zoom: 10
+          });
+
+          var markers = [${markers}];
+          markers.forEach(marker => {
+            var el = document.createElement('div');
+            el.style.backgroundColor = marker.severityColor;
+            el.style.width = '20px';
+            el.style.height = '20px';
+            el.style.borderRadius = '50%';
+            el.style.cursor = 'pointer';
+
+            new tt.Marker({ element: el })
+              .setLngLat(marker.position)
+              .addTo(map)
+              .on('click', () => {
+                window.ReactNativeWebView.postMessage(JSON.stringify(marker));
+              });
+          });
+        </script>
+      </body>
+      </html>
+    `;
+  };
+
   return (
     <View style={{ flex: 1 }}>
-      <MapView
-        style={{ flex: 1 }}
-        initialRegion={{
-          latitude: userLocation?.coords.latitude || 20.5937,
-          longitude: userLocation?.coords.longitude || 78.9629,
-          latitudeDelta: 15,
-          longitudeDelta: 15,
+      <WebView
+        originWhitelist={['*']}
+        source={{ html: generateHtmlContent() }}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        onMessage={(event: any) => {
+          const alert = JSON.parse(event.nativeEvent.data);
+          handleMarkerPress(alert);
         }}
-      >
+      />
 
-      {userLocation && (
-          <Marker
-            coordinate={{
-              latitude: userLocation.coords.latitude,
-              longitude: userLocation.coords.longitude,
-            }}
-            title="Your Location"
-            pinColor="blue"
-          />
-        )}
-
-
-        {alerts.map((alert) => {
-          const [longitude, latitude] = alert.centroid.split(',').map(Number);
-          return (
-            <Marker
-              key={alert.identifier}
-              coordinate={{ latitude, longitude }}
-              pinColor={alert.severity_color}
-              onPress={() => handleMarkerPress(alert)}
-            />
-          );
-        })}
-      </MapView>
-
-      {(selectedAlert)?(
+      {(selectedAlert) ? (
         <View style={styles.overlay}>
           <View style={[styles.modalContent]}>
 
             <View style={styles.modalHeader}>
-                <View style = {{flex:1, flexDirection: "row", justifyContent: "flex-start"}}>
-                <Ionicons name="warning-outline" size={26} color={selectedAlert.severity_color} style={{paddingTop: 7}}/>
+              <View style={{ flex: 1, flexDirection: "row", justifyContent: "flex-start" }}>
+                <Ionicons name="warning-outline" size={26} color={selectedAlert.severity_color} style={{ paddingTop: 7 }} />
                 <Text style={styles.modalTitle}>
-                    {selectedAlert.severity_color.charAt(0).toUpperCase()+selectedAlert.severity_color.substring(1,).toLowerCase()} Alert issued by {selectedAlert.alert_source}
+                  {selectedAlert.severity_color.charAt(0).toUpperCase() + selectedAlert.severity_color.substring(1).toLowerCase()} Alert issued by {selectedAlert.alert_source}
                 </Text>
-                </View>
-                <TouchableOpacity onPress={closeModal}>
+              </View>
+              <TouchableOpacity onPress={closeModal}>
                 <Ionicons name="close" size={24} color={"black"} />
-                </TouchableOpacity>
+              </TouchableOpacity>
             </View>
             <>
 
-            <View style={{flexDirection: 'row', paddingBottom: 10}}>
+              <View style={{ flexDirection: 'row', paddingBottom: 10 }}>
                 <Text>{'\u2022'}</Text>
-                <Text style={{flex: 1, paddingLeft: 5}}>{selectedAlert.severity_level.charAt(0).toUpperCase()}{selectedAlert.severity_level.substring(1,).toLowerCase()} occurence of 
-                    {' '+selectedAlert.disaster_type.toLowerCase()}
+                <Text style={{ flex: 1, paddingLeft: 5 }}>{selectedAlert.severity_level.charAt(0).toUpperCase()}{selectedAlert.severity_level.substring(1).toLowerCase()} occurrence of
+                  {' ' + selectedAlert.disaster_type.toLowerCase()}
                 </Text>
-            </View>
+              </View>
 
-            <View style={{flexDirection: 'row', paddingBottom: 10}}>
+              <View style={{ flexDirection: 'row', paddingBottom: 10 }}>
                 <Text>{'\u2022'}</Text>
-                <Text style={{flex: 1, paddingLeft: 5}}>Expected in {selectedAlert.area_description}</Text>
-            </View>
+                <Text style={{ flex: 1, paddingLeft: 5 }}>Expected in {selectedAlert.area_description}</Text>
+              </View>
 
-            {(selectedAlert.severity==="WARNING" || selectedAlert.severity=="Orange" || selectedAlert.severity == "Red" || selectedAlert.severity == "Yellow")?(
-            <View style={{flexDirection: 'row', paddingBottom: 10}}>
-                <Text>{'\u2022'}</Text>
-                <Text style={{flex: 1, paddingLeft: 5}}>Individuals in and near this area are requested to stay on 'ALERT'</Text>
-            </View>):(
-            <View style={{flexDirection: 'row', paddingBottom: 10}}>
-                <Text>{'\u2022'}</Text>
-                <Text style={{flex: 1, paddingLeft: 5}}>Individuals in and around this area are requested to stay on '{selectedAlert.severity}'</Text>
-            </View>
-            )}
+              {(selectedAlert.severity === "WARNING" || selectedAlert.severity == "Orange" || selectedAlert.severity == "Red" || selectedAlert.severity == "Yellow") ? (
+                <View style={{ flexDirection: 'row', paddingBottom: 10 }}>
+                  <Text>{'\u2022'}</Text>
+                  <Text style={{ flex: 1, paddingLeft: 5 }}>Individuals in and near this area are requested to stay on 'ALERT'</Text>
+                </View>) : (
+                <View style={{ flexDirection: 'row', paddingBottom: 10 }}>
+                  <Text>{'\u2022'}</Text>
+                  <Text style={{ flex: 1, paddingLeft: 5 }}>Individuals in and around this area are requested to stay on '{selectedAlert.severity}'</Text>
+                </View>
+              )}
 
-            <View style={{flexDirection: 'row', paddingBottom: 10}}>
+              <View style={{ flexDirection: 'row', paddingBottom: 10 }}>
                 <Text>{'\u2022'}</Text>
-                <Text style={{flex: 1, paddingLeft: 5}}>Expected to last from {formatDateTime(selectedAlert.effective_start_time)} to {formatDateTime(selectedAlert.effective_end_time)}</Text>
-            </View>
-            
+                <Text style={{ flex: 1, paddingLeft: 5 }}>Expected to last from {formatDateTime(selectedAlert.effective_start_time)} to {formatDateTime(selectedAlert.effective_end_time)}</Text>
+              </View>
+
             </>
 
           </View>
         </View>
-      ):(<></>)}
+      ) : (<></>)}
     </View>
   );
 };
