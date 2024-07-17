@@ -35,7 +35,7 @@ export class dbClient {
     };
   }
 
-  async addPost(userID: string, username: string, textualInfo: string, multimediaURL: string[], timestamp: number, geoLocation: [number, number]) {
+  async addPost(userID: string, username: string, profilephoto:string, textualInfo: string, multimediaURL: string[], timestamp: number, geoLocation: [number, number]) {
     let postID: string = sha256(String(userID) + textualInfo + String(multimediaURL) + timestamp + String(geoLocation)).toString();
     const geoLocationStr = `(${geoLocation[0]},${geoLocation[1]})`
     console.log(geoLocationStr)
@@ -58,7 +58,7 @@ export class dbClient {
       return { message: 'Post Added Successfully' };
     } catch (e) {
       console.error('Failed Adding Post:', e);
-      return { message: 'Failed Adding Post' };
+      return { message: 'Failed Adding Post. Try again after some time!' };
     }
   }
 

@@ -2,9 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import * as SecureStore from 'expo-secure-store';
 
 interface UserDetails {
-  userID: string | null;
-  userName: string | null;
-  profileImage: string | null;
+  userID: string;
+  userName: string;
+  profileImage: string;
 }
 
 interface UserContextType {
@@ -13,17 +13,17 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType>({
   userDetails: {
-    userID: null,
-    userName: null,
-    profileImage: null
+    userID: '',
+    userName: '',
+    profileImage: ''
   }
 });
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [userDetails, setUserDetails] = useState<UserDetails>({
-    userID: null,
-    userName: null,
-    profileImage: null
+    userID: '',
+    userName: '',
+    profileImage: ''
   });
 
   useEffect(() => {
