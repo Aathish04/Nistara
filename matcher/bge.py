@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer
-model = SentenceTransformer('./all-mpnet-base-v2')
+
+model = SentenceTransformer('all-mpnet-base-v2',cache_folder='.')
 
 
 if __name__=="__main__":
