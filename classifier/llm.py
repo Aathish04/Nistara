@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 load_dotenv()
 
 LLM_API_KEY = environ.get("LLM_API_KEY", "No-Key")
-genai.configure(api_key=LLM_API_KEY)
+genai.configure(api_key="AIzaSyCz0f3SEoLCLvHS2keUwU1k2ozdnbtPw4s")
 
 logger.info("Configured Google Generative AI with provided API key.")
 
