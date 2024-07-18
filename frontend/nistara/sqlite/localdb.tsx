@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import { sha256 } from 'js-sha256';
 
 export class SQLiteClient{
     db: any;
@@ -8,12 +9,11 @@ export class SQLiteClient{
         this.db = SQLite.openDatabaseSync('nistara.db');
     }
 
+    // not used or called anywhere
     async createTable() {
-        console.log("hello world")
         await this.db.execAsync(`CREATE TABLE IF NOT EXISTS posts (
-            postid TEXT PRIMARY KEY,
-            geolocation_lat REAL,
-            geolocation_long REAL,
+            id TEXT PRIMARY KEY,
+            geolocation TEXT,
             multimediaurl TEXT,
             textcontent TEXT,
             timestamp TEXT,
@@ -27,19 +27,21 @@ export class SQLiteClient{
             class TEXT,
             translator INTEGER,
             istranslated INTEGER,
-            translatedtextcontent TEXT
+            translatedtextcontent TEXT,
+            mesh INTEGER
         )`)
         console.log("created successfully")
     }
 
-    async insertPost(post: any, mesh: boolean){
+    async addPost(post: any, mesh: boolean){
+        console.log(post)
         await this.db.runAsync(
-            `INSERT INTO posts (postid, geolocation_lat, geolocation_long, multimediaurl, textcontent,
+            `INSERT INTO posts (id, geolocation, multimediaurl, textcontent,
             timestamp, lastupdatetimestamp, userid, username, profilephoto, language, classifier, isclassified, class,
-            translator, istranslated, translatedtextcontent, mesh) VALUES `,
-           [post.postid,
-            post.geolocation[0],
-            post.geolocation[1],
+            translator, istranslated, translatedtextcontent, mesh) VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) `,
+           [post.id,
+            JSON.stringify(post.geolocation),
             JSON.stringify(post.multimediaurl),
             post.textcontent,
             post.timestamp,
@@ -49,15 +51,60 @@ export class SQLiteClient{
             post.profilephoto,
             post.language,
             post.classifier,
-            post.isclassified,
+            post.isclassified? 1: 0,
             post.class,
             post.translator,
-            post.istranslated,
+            post.istranslated? 1: 0,
             post.translatedtextcontent,
-            mesh
+            mesh? 1: 0
            ]
         )
+        console.log("added post successfully")
     }
+
+    async writePost(userid: string, username: string, profilephoto:string, textcontent: string, multimediaurl: string[], timestamp: number, geoLocation: [number, number], language:string, mesh: boolean){
+        let postid: string = sha256(String(userid) + textcontent + String(multimediaurl) + timestamp + String(geoLocation)).toString();
+        let data: any;
+
+        data = {
+        id: postid,
+        geolocation: geoLocation,
+        multimediaurl,
+        textcontent,
+        timestamp : timestamp,
+        lastupdatetimestamp: timestamp,
+        userid,
+        username,
+        profilephoto,
+        language,
+        classifier: -1,
+        isclassified: false,
+        class: null
+        }
+
+        let payload: any
+        if(language=='eng_Latn' || language=='en'){
+        payload = {
+            ...data,
+            translator: -1,
+            istranslated: true,
+            translatedtextcontent: textcontent
+        };
+        }else{
+        payload = {
+            ...data,
+            translator: -1,
+            istranslated: false,
+            translatedtextcontent: null
+        }
+        }
+
+        console.log(payload)
+        console.log(mesh)
+
+        await this.addPost(payload, mesh)
+    }
+
 
     async updatePost(post: any){
         await this.db.runAsync(
@@ -73,33 +120,86 @@ export class SQLiteClient{
             [
                 post.lastupdatetimestamp,
                 post.classifier,
-                post.isclassified,
+                post.isclassified? 1: 0,
                 post.class,
                 post.translator,
-                post.istranslated,
+                post.istranslated? 1: 0,
                 post.translatedtextcontent,
                 post.postid
             ]
         )
     }
 
-    async insertPostsFromCloudDb(postsCloudDb: any){
+    
+    async getPosts(){
+        // retrieve all posts from the sqlite db on local, and return as array of json objects
+        // return in format compatible with screens -- geolocation and multimediaurl as lists 
+        const allPosts = await this.db.getAllAsync('SELECT * from posts');
+        let posts;
+        if(allPosts.length>0){
+           posts = allPosts.map((post: any)=>({
+                    id: post.id,
+                    geolocation: JSON.parse(post.geolocation),
+                    multimediaurl: JSON.parse(post.multimediaurl),
+                    textcontent: post.textcontent,
+                    timestamp: post.timestamp,
+                    lastupdatetimestamp: post.lastupdatetimestamp,
+                    userid: post.userid,
+                    username: post.username,
+                    profilephoto: post.profilephoto,
+                    language: post.language,
+                    classifier: post.classifier,
+                    isclassified: (post.isclassified==1)? true: false,
+                    class: post.class,
+                    translator: post.translator,
+                    istranslated: (post.istranslated==1)? true: false,
+                    translatedtextcontent: post.translatedtextcontent
+                }))
+            return {message: 'Posts retrieval successful', result: posts}
+        }else return {message: 'No posts to retrieve', result: []}
+        
+    }
+
+    async validateAddAndUpdatePosts(posts: any[], mesh: boolean){
         // retrieve all posts from sqlite 
-        // for each post in postsCloudDb, check if present in sqlite by postid
+        // for each post in posts, check if present in sqlite by postid
         // if not present insert into sqlite directly
         // if present, check if lastupdatedtimestamp is different from postsCloudDb
         // if different update
         // if not different, continue
         // repeat till all posts are parsed
+    try{
+        const response = await this.getPosts();
+        const postsLocal: any[] = response.result
+        if(postsLocal.length==0){
+            // add all posts received 
+            posts.map(async(post:any)=>{
+                await this.addPost(post, mesh)
+            })
+        }else{
+            // every local posts with post id
+            const localPostsMap = new Map(postsLocal.map((post: any) => [post.id, post]));
 
-        
+            for(const post of posts){
+                const localPost = localPostsMap.get(post.id) // check if given post in sqlite
+                
+                if(!localPost){
+                    await this.addPost(post, mesh)
+                }else{
+                    // post is present in local, see if it is updated
+                    if(localPost.lastupdatedtimestamp !== post.lastupdatedtimestamp){
+                        await this.updatePost(post) // if updated, update in local as well
+                    }
+                }
+            }
+        }
+    }catch(error){
+        console.error(error)
+    }     
     }
 
-    async getAllPosts(){
-        // retrieve all posts from the sqlite db on local, and return as array of json objects
-        // return in format compatible with screens -- geolocation and multimediaurl as lists 
-        const allPosts = await this.db.getAllAsync('SELECT * from posts');
-        console.log(allPosts)
-    }
+    async clearPostsTable(){
 
+    }
+    
 }

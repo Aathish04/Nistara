@@ -4,20 +4,20 @@ import SafeViewAndroid from "../components/SafeViewAndroid";
 import { SQLiteClient } from "../sqlite/localdb";
 
 const ForYouScreen = ({navigation}: {navigation: any}) => {
-    // const client = new SQLiteClient()
+    const client = new SQLiteClient()
 
-    // const testSQLite = async() =>{
-    //     console.log("here")
-    //     // await client.createTable()
-    //     await client.getAllPosts()
-    // }
+    const testSQLite = async() =>{
+        console.log("here")
+        // await client.createTable()
+        const response = await client.getPosts()
+        console.log(response.result)
+    }
 
     return (
         <SafeAreaView style={SafeViewAndroid.AndroidSafeArea}>
-            {/* <TouchableOpacity onPress= {()=>{testSQLite()}}>
+            <TouchableOpacity onPress= {()=>{testSQLite()}}>
                 <Text>Click here to test sqlite</Text>
-            </TouchableOpacity> */}
-            <Text>For You Screen</Text>
+            </TouchableOpacity>
         </SafeAreaView>
     )
 

@@ -221,7 +221,7 @@ export default function App() {
   }
 
   let actualview = (
-
+  <SQLiteProvider databaseName='nistara.db' onInit={createTable}>
     <UserProvider>
       <NavigationContainer>
         <Stack.Navigator>
@@ -258,6 +258,7 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
+    </SQLiteProvider>
   );
   let meshtestview = (
     <View style={styles.container}>
@@ -273,6 +274,29 @@ export default function App() {
   )
   
   return actualview
+}
+
+async function createTable(db: SQLiteDatabase){
+    await db.execAsync(`CREATE TABLE IF NOT EXISTS posts (
+      id TEXT PRIMARY KEY,
+      geolocation TEXT,
+      multimediaurl TEXT,
+      textcontent TEXT,
+      timestamp TEXT,
+      lastupdatetimestamp TEXT,
+      userid TEXT,
+      username TEXT,
+      profilephoto TEXT,
+      language TEXT,
+      classifier INTEGER,
+      isclassified INTEGER,
+      class TEXT,
+      translator INTEGER,
+      istranslated INTEGER,
+      translatedtextcontent TEXT,
+      mesh INTEGER
+  )`)
+console.log("db created successfully")
 }
 
 const styles = StyleSheet.create({

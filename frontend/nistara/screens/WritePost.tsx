@@ -1,6 +1,7 @@
 import React, { useState , useEffect} from 'react';;
 import { Text, TouchableOpacity, View, StyleSheet, Image, TextInput, SafeAreaView } from 'react-native';
 import {dbClient} from '../database/database';
+import { SQLiteClient } from "../sqlite/localdb";
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons'
 import SafeViewAndroid from '../components/SafeViewAndroid';
@@ -18,6 +19,7 @@ const WritePost = ({navigation}:{navigation: any}) => {
   
   
   const database = new dbClient();
+  const sqlClient = new SQLiteClient()
 
   const { userID, userName, profileImage, language } = useUser();
   // console.log(userID, userName, profileImage, language)
@@ -44,6 +46,7 @@ const WritePost = ({navigation}:{navigation: any}) => {
     let response;
     try{
       response = await database.addPost(userID, userName, profileImage, text, [] ,Date.now(), [lat,long], language)
+      await sqlClient.writePost(userID, userName, profileImage, text, [] ,Date.now(), [lat,long], language, false)
     }catch(e){
       if(response) setErrorMsg(response.message)
       console.error(e)
