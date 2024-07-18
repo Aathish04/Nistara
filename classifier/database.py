@@ -53,6 +53,7 @@ def insertData():
         (str(uuid.uuid4()), str(uuid.uuid4()), 'user7', None, UNSET_CLASSIFIER_ID, (40.7128, -74.0060), False, ['url7'], 'Safety and protection gear required for volunteers.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
         (str(uuid.uuid4()), str(uuid.uuid4()), 'user8', None, UNSET_CLASSIFIER_ID, (37.7749, -122.4194), False, ['url8'], 'Request for evacuation assistance for elderly residents.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
         (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'Searching for missing person: John Doe, last seen near the river.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'I have first aid kits to donate, please contact if u need them', datetime.utcnow(), datetime.utcnow(),'en',-1,True)
     ]
 
     for post in posts:
@@ -83,12 +84,11 @@ def getUnclassifiedPostInformation():
     except IndexError:
         logger.warning("No unclassified posts.")
         return None
-
 def putExtractedInformation(extracted_info, post_data):
     logger.debug(f"Extracted information: {extracted_info}")
     logger.debug(f"Post data: {post_data}")
     
-    category = str(extracted_info['category'])
+    postclass = str(extracted_info['category'])
     userid = str(post_data['userid'])
     multimediaurl = post_data['multimediaurl']
     postid = str(post_data['id'])
@@ -103,7 +103,7 @@ def putExtractedInformation(extracted_info, post_data):
     combined_str = str(combined).encode()
     result = hashlib.sha256(combined_str)
     
-    if category == 'OFFER':
+    if postclass == 'OFFER':
         for item in extracted_info['items']:
             combined_per_item = {**post_data, **item}
             combined_per_item_str = str(combined_per_item).encode()
@@ -111,34 +111,28 @@ def putExtractedInformation(extracted_info, post_data):
             donationid = result.hexdigest()
             
             item_name = item['itemName']
+            class_ = item["class"]
             
             if item['quantity']:
                 quantity = int(item['quantity']) or None
             else:
                 quantity = None
                 
-            
-            prepared = session.prepare("INSERT INTO main.donation (id, matcherid, item, geolocation, ismatched, postid, quantity, userid, username, profilephoto, timestamp, translatedtextcontent, umbrellatype) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
-            session.execute(prepared, (str(donationid), UNSET_MATCHER_ID, item_name, geolocation, False, postid, quantity, str(userid), username, profilephoto, timestamp, textualinfo, item['class']))
+            # Correct order of fields
+            prepared = session.prepare("INSERT INTO main.donations (id, umbrellatype, postid, userid, item, quantity, postclass, geolocation, ismatched, username, profilephoto, timestamp, translatedtextcontent, matcherid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
+            session.execute(prepared, (str(donationid), class_ , postid, userid, item_name, quantity,postclass, geolocation, False, username, profilephoto, timestamp, textualinfo, UNSET_MATCHER_ID))
             logger.info(f"Inserted donation: {donationid}")
 
-    elif category == 'REQUEST_EVACUATION':
-        prepared = session.prepare("INSERT INTO main.requests (id, umbrellatype, postid, userid, item, quantity, postclass, geolocation, ismatched, username, profilephoto, timestamp, translatedtextcontent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
+    elif postclass == 'REQUEST_EVACUATION' or postclass == 'REQUEST_SEARCH':
+        # Correct order of fields
+        prepared = session.prepare("INSERT INTO main.requests (id, umbrellatype, postid, userid, item, quantity, postclass, geolocation, ismatched, username, profilephoto, timestamp, translatedtextcontent, matcherid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
         combined_str = str({**post_data, **extracted_info}).encode()
         result = hashlib.sha256(combined_str)
         requestid = result.hexdigest()
-        session.execute(prepared, (requestid, category, postid, userid, None, None, None, geolocation, False, username, profilephoto, timestamp, textualinfo))
-        logger.info(f"Inserted evacuation request: {requestid}")
-
-    elif category == 'REQUEST_SEARCH':
-        prepared = session.prepare("INSERT INTO main.requests (id, umbrellatype, postid, userid, item, quantity, postclass, geolocation, ismatched, username, profilephoto, timestamp, translatedtextcontent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
-        combined_str = str({**post_data, **extracted_info}).encode()
-        result = hashlib.sha256(combined_str)
-        requestid = result.hexdigest()
-        session.execute(prepared, (requestid, category, postid, userid, None, None, None, geolocation, False, username, profilephoto, timestamp, textualinfo))
+        session.execute(prepared, (requestid, None , postid, userid, None, None, None, geolocation, False, username, profilephoto, timestamp, textualinfo, UNSET_MATCHER_ID))
         logger.info(f"Inserted search request: {requestid}")
 
-    elif category == 'REQUEST_ITEM':
+    elif postclass == 'REQUEST_ITEM':
         for item in extracted_info['items']:
             combined_per_item = {**post_data, **item}
             combined_per_item_str = str(combined_per_item).encode()
@@ -152,13 +146,18 @@ def putExtractedInformation(extracted_info, post_data):
                 quantity = int(item['quantity']) or None
             else:
                 quantity = None
-
-            prepared = session.prepare("INSERT INTO main.requests (id, umbrellatype, postid, userid, item, quantity, postclass, geolocation, ismatched, username, profilephoto, timestamp, translatedtextcontent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
-            session.execute(prepared, (requestid, category, postid, userid, item_name, quantity, class_, geolocation, False, username, profilephoto, timestamp, textualinfo))
             
-    
+            prepared = session.prepare("INSERT INTO main.requests (id, umbrellatype, postid, userid, item, quantity, postclass, geolocation, ismatched, username, profilephoto, timestamp, translatedtextcontent, matcherid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")
+            session.execute(prepared, (requestid, class_ , postid, userid, item_name, quantity, postclass, geolocation, False, username, profilephoto, timestamp, textualinfo, UNSET_MATCHER_ID))
+            logger.info(f"Inserted item request of type {class_}: {requestid}")
 
-    update_query = f"UPDATE main.posts SET lastupdatetimestamp = ?,isclassified = ?, class = ? WHERE id = ?;"
+    update_query = "UPDATE main.posts SET lastupdatetimestamp = ?, isclassified = ?, class = ? WHERE id = ?;"
     prepared_statement = session.prepare(update_query)
-    session.execute(prepared_statement, (datetime.utcnow(),True, category, postid))
-    logger.info(f"Updated post {postid} as classified with tag {category}")
+    session.execute(prepared_statement, (datetime.utcnow(), True, postclass, postid))
+    logger.info(f"Updated post {postid} as classified with tag {postclass}")
+
+
+
+
+if __name__ == "__main__":
+    insertData()

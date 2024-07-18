@@ -1,5 +1,5 @@
 CREATE TABLE main.posts (
-    postid text PRIMARY KEY,
+    id text PRIMARY KEY,
     geolocation frozen<tuple<double, double>>,
     multimediaurl list<text>,
     textcontent text,
@@ -16,7 +16,7 @@ CREATE TABLE main.posts (
     class text,
 
     translator int,
-    istranslated text,
+    istranslated boolean,
     translatedtextcontent text
 )
 
@@ -47,7 +47,7 @@ CREATE TABLE main.donations (
     item text,
     quantity int,
 
-    postid text
+    postid text,
     geolocation frozen<tuple<double, double>>,
     translatedtextcontent text,
     timestamp timestamp,
@@ -73,22 +73,20 @@ CREATE TABLE main.MATCHES(
 
 CREATE TABLE IF NOT EXISTS main.USERS
 (
-    userid text PRIMARY KEY,
+    id text PRIMARY KEY,
+    name text,
+    phoneNumber text,
     address text,
-    dateofbirth text,
-    email text,
-    gender text,
-    maskednumber text,
-    password text,
-    phone text,
-    profileimage text,
-    username text
+    language text,
+    geoLocation tuple<double,double>,
+    profileImage text,
+    maskedAadhar text,
 );
 
 CREATE TABLE main.INSTANCES(
     id int PRIMARY KEY,
-    type string,
-    userid string,
+    type text,
+    userid text,
     name text,
     phoneNumber text,
     address text
