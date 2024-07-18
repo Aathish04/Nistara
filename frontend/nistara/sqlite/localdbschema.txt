@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS posts(
+    postid TEXT PRIMARY KEY,
+    geolocation_lat REAL,
+    geolocation_long REAL,
+    multimediaurl TEXT,
+    textcontent TEXT,
+    timestamp TEXT,
+    lastupdatetimestamp TEXT,
+    userid TEXT,
+    username TEXT,
+    profilephoto TEXT,
+    language TEXT,
+    classifier INTEGER,
+    isclassified INTEGER,
+    class TEXT,
+    translator INTEGER,
+    istranslated INTEGER,
+    translatedtextcontent TEXT
+)

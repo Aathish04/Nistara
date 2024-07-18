@@ -1,5 +1,5 @@
 CREATE TABLE main.posts (
-    id text PRIMARY KEY,
+    postid text PRIMARY KEY,
     geolocation frozen<tuple<double, double>>,
     multimediaurl list<text>,
     textcontent text,
@@ -73,14 +73,16 @@ CREATE TABLE main.MATCHES(
 
 CREATE TABLE IF NOT EXISTS main.USERS
 (
-    id text PRIMARY KEY,
-    name text,
-    phoneNumber text,
+    userid text PRIMARY KEY,
     address text,
-    language text,
-    geoLocation tuple<double,double>,
-    profileImage text,
-    maskedAadhar text,
+    dateofbirth text,
+    email text,
+    gender text,
+    maskednumber text,
+    password text,
+    phone text,
+    profileimage text,
+    username text
 );
 
 CREATE TABLE main.INSTANCES(

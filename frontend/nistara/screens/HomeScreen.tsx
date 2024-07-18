@@ -8,7 +8,7 @@ const Tab = createMaterialTopTabNavigator();
 
 // component screen renders
 import Post from './PostScreen';
-import WarningsAwarenessScreen from './WarningsAwarenessScreen';
+import ForYouScreen from './HomeForYouScreen';
 
 const HomeTopTabs = () =>{
    
@@ -34,7 +34,7 @@ const HomeTopTabs = () =>{
             />
             <Tab.Screen 
                 name="For you"
-                component={WarningsAwarenessScreen}
+                component={ForYouScreen}
             />
         </Tab.Navigator>
     )

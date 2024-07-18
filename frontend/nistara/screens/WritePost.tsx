@@ -6,8 +6,9 @@ import { Ionicons } from '@expo/vector-icons'
 import SafeViewAndroid from '../components/SafeViewAndroid';
 import { useUser } from '../components/UserContext';
 import { images } from '../constants/Images';
+import { useRoute } from '@react-navigation/native';
 
-const WritePost = ({routes, navigation}: {routes: any, navigation: any}) => {
+const WritePost = ({navigation}:{navigation: any}) => {
 
   const [location, setLocation] = useState<Location.LocationObject>();
   const [errorMsg, setErrorMsg] = useState("");
