@@ -5,6 +5,7 @@ interface UserDetails {
   userID: string;
   userName: string;
   profileImage: string;
+  language: string;
 }
 
 interface UserContextType {
@@ -15,7 +16,8 @@ const UserContext = createContext<UserContextType>({
   userDetails: {
     userID: '',
     userName: '',
-    profileImage: ''
+    profileImage: '',
+    language: ''
   }
 });
 
@@ -23,7 +25,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userDetails, setUserDetails] = useState<UserDetails>({
     userID: '',
     userName: '',
-    profileImage: ''
+    profileImage: '',
+    language: ''
   });
 
   useEffect(() => {
@@ -31,8 +34,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const jsonValue = await SecureStore.getItemAsync('User');
         if (jsonValue) {
-          const { userID, userName, profileImage } = JSON.parse(jsonValue);
-          setUserDetails({ userID, userName, profileImage });
+          const { userID, userName, profileImage, language} = JSON.parse(jsonValue);
+          setUserDetails({ userID, userName, profileImage, language });
         }
       } catch (error) {
         console.error('Error loading user credentials:', error);

@@ -77,10 +77,15 @@ CREATE TABLE IF NOT EXISTS main.USERS
     name text,
     phoneNumber text,
     address text,
-    language text,
-    geoLocation tuple<double,double>,
-    profileImage text,
-    maskedAadhar text,
+    dateofbirth text,
+    email text,
+    gender text,
+    maskednumber text,
+    password text,
+    phone text,
+    profileimage text,
+    username text,
+    language text
 );
 
 CREATE TABLE main.INSTANCES(
