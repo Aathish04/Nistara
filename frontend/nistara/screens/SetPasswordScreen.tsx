@@ -19,7 +19,8 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [lang, setLang] = useState(languages["English"])
+    const [language, setLanguage] = useState(languages["English"])
+    console.log(language)
 
 
     const languageItems = Object.keys(languages).map(key => ({ label: key, value: languages[key] }));
@@ -38,7 +39,7 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
               ...userInfo,
               password,
               userID,
-              lang
+              language
             };
             const userPayloadString = JSON.stringify(userPayload);
             await SecureStore.setItemAsync('User', userPayloadString);
@@ -81,8 +82,8 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
                 <Text style={styles.label}>Your Preferred Language</Text>
                 <View style={styles.pickerContainer}>
                     <Picker
-                        selectedValue={lang}
-                        onValueChange={(itemValue) => setLang(itemValue)}
+                        selectedValue={language}
+                        onValueChange={(itemValue) => setLanguage(itemValue)}
                         style={styles.picker}
                     >
                         {languageItems.map(item => (

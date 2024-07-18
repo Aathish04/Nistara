@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS main.USERS
     phone text,
     profileimage text,
     username text,
-    lang text
+    language text
 );
 
 CREATE TABLE main.INSTANCES(

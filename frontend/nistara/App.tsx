@@ -65,7 +65,7 @@ function AuthStack(){
 
 function HomeTabs({navigation}:{navigation:any}){
 
-  const { userID, userName, profileImage, lang } = useUser();
+  const { userID, userName, profileImage, language } = useUser();
   let userAvatar: any;
   if (profileImage) userAvatar = images[profileImage]
   else userAvatar = require('./assets/profile/dog.png')

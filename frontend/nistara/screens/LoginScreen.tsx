@@ -20,7 +20,7 @@ interface User {
     email: string,
     phone: string,
     password: string,
-    lang: string
+    language: string
   }
 
 const LoginScreen = ({navigation}: {navigation: any}) =>{
@@ -48,7 +48,7 @@ const LoginScreen = ({navigation}: {navigation: any}) =>{
                     email: response.user.email,
                     phone: response.user.phone,
                     password: response.user.password,
-                    lang: response.user.lang
+                    language: response.user.language
                 }
                 const userPayloadString = JSON.stringify(user);
                 await SecureStore.setItemAsync('User', userPayloadString);

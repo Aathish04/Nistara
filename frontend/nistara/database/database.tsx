@@ -13,7 +13,7 @@ interface User {
   email: string,
   phone: string,
   password: string,
-  lang: string
+  language: string
 }
 
 const cred = new Credential();
@@ -156,7 +156,7 @@ export class dbClient {
       email: user.email,
       phone: user.phone,
       password: user.password,
-      lang: user.lang
+      language: user.language
     };
     try {
       await axios.post(`${this.baseUrl}/users`, newUser, { headers: this.headers });
