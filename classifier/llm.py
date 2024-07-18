@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 load_dotenv()
 
 LLM_API_KEY = environ.get("LLM_API_KEY", "No-Key")
-genai.configure(api_key=LLM_API_KEY)
+genai.configure(api_key="AIzaSyCz0f3SEoLCLvHS2keUwU1k2ozdnbtPw4s")
 
 logger.info("Configured Google Generative AI with provided API key.")
 
@@ -81,10 +81,10 @@ def extract_event_data_from_post(post):
     text_image_describe_prompt = f"""
     You are an information extraction system. Your task is to extract information from a given post and categorize it accordingly. The possible categories for the post are:
 
-{'\n'.join(POST_CATEGORIES)}
+{','.join(POST_CATEGORIES)}
 For each item extracted from the post, assign it to one of the following classes:
 
-{'\n'.join(ITEM_CLASSES)}
+{','.join(ITEM_CLASSES)}
 The post details are given by {post}. Your task is to:
 
 Identify the category of the post.
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     while True:
         post = getUnclassifiedPostInformation()
         if post:
-            logger.info(f"Processing post: {post['postid']}")
+            logger.info(f"Processing post: {post['id']}")
             extracted = extract_event_data_from_post(post)
             if extracted:
                 logger.info(f"Extracted data: {extracted}")
