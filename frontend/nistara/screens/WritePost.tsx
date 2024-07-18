@@ -19,7 +19,8 @@ const WritePost = ({navigation}:{navigation: any}) => {
   
   const database = new dbClient();
 
-  const { userID, userName, profileImage } = useUser();
+  const { userID, userName, profileImage, lang } = useUser();
+  // console.log(userID, userName, profileImage, lang)
   const userAvatar: any = images[profileImage];
 
 

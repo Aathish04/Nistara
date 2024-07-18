@@ -39,6 +39,9 @@ import WritePost from './screens/WritePost';
 // User Profile Screens
 import YourProfileScreen from './screens/YourProfileScreen';
 
+// sqlite --local store
+import { SQLiteProvider, useSQLiteContext, type SQLiteDatabase } from 'expo-sqlite';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -62,7 +65,7 @@ function AuthStack(){
 
 function HomeTabs({navigation}:{navigation:any}){
 
-  const { userID, userName, profileImage } = useUser();
+  const { userID, userName, profileImage, lang } = useUser();
   let userAvatar: any;
   if (profileImage) userAvatar = images[profileImage]
   else userAvatar = require('./assets/profile/dog.png')

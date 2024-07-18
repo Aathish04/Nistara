@@ -1,5 +1,5 @@
 CREATE TABLE main.posts (
-    postid text PRIMARY KEY,
+    id text PRIMARY KEY,
     geolocation frozen<tuple<double, double>>,
     multimediaurl list<text>,
     textcontent text,
@@ -16,7 +16,7 @@ CREATE TABLE main.posts (
     class text,
 
     translator int,
-    istranslated text,
+    istranslated boolean,
     translatedtextcontent text
 )
 
@@ -82,7 +82,8 @@ CREATE TABLE IF NOT EXISTS main.USERS
     password text,
     phone text,
     profileimage text,
-    username text
+    username text,
+    lang text
 );
 
 CREATE TABLE main.INSTANCES(
