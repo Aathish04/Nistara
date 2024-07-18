@@ -20,7 +20,7 @@ const WritePost = ({navigation}:{navigation: any}) => {
   const database = new dbClient();
 
   const { userID, userName, profileImage, language } = useUser();
-  console.log(userID, userName, profileImage, language)
+  // console.log(userID, userName, profileImage, language)
   const userAvatar: any = images[profileImage];
 
 
@@ -40,10 +40,10 @@ const WritePost = ({navigation}:{navigation: any}) => {
     })();
   }, []);
 
-  const handlePost = async (userID:string,username:string,profilephoto: string, textualinfo:string) => {
+  const handlePost = async () => {
     let response;
     try{
-      response = await database.addPost(userID,username,profilephoto, textualinfo,['url'],Date.now(),[lat,long])
+      response = await database.addPost(userID, userName, profileImage, text, [] ,Date.now(), [lat,long], language)
     }catch(e){
       if(response) setErrorMsg(response.message)
       console.error(e)
@@ -87,7 +87,7 @@ const WritePost = ({navigation}:{navigation: any}) => {
                       ...styles.button,
                       ...{ backgroundColor: '#95A8EF'},
                   }}
-                  onPress = {()=>{handlePost(userID, userName, profileImage, text)}}
+                  onPress = {()=>{handlePost()}}
                   >
                   <Text style={{ fontSize: 20, ... { color: '#FFFFFF' } }}>Post!</Text>
               </TouchableOpacity>
