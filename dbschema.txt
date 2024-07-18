@@ -47,7 +47,7 @@ CREATE TABLE main.donations (
     item text,
     quantity int,
 
-    postid text
+    postid text,
     geolocation frozen<tuple<double, double>>,
     translatedtextcontent text,
     timestamp timestamp,
@@ -73,7 +73,9 @@ CREATE TABLE main.MATCHES(
 
 CREATE TABLE IF NOT EXISTS main.USERS
 (
-    userid text PRIMARY KEY,
+    id text PRIMARY KEY,
+    name text,
+    phoneNumber text,
     address text,
     dateofbirth text,
     email text,
@@ -88,8 +90,8 @@ CREATE TABLE IF NOT EXISTS main.USERS
 
 CREATE TABLE main.INSTANCES(
     id int PRIMARY KEY,
-    type string,
-    userid string,
+    type text,
+    userid text,
     name text,
     phoneNumber text,
     address text
