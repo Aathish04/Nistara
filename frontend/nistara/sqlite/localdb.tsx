@@ -200,6 +200,7 @@ export class SQLiteClient{
 
     async clearPostsTable(){
         await this.db.execAsync(`DELETE FROM posts`);
+        await this.db.execAsync('VACUUM');
         console.log("All rows deleted successfully");
     }
     

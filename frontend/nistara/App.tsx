@@ -295,8 +295,52 @@ async function createTable(db: SQLiteDatabase){
       istranslated INTEGER,
       translatedtextcontent TEXT,
       mesh INTEGER
-  )`)
-console.log("db created successfully")
+    )`)
+
+    await db.execAsync(`CREATE TABLE IF NOT EXISTS requests (
+      id TEXT PRIMARY KEY,
+      geolocation TEXT,
+      ismatched INTEGER,
+      item TEXT,
+      matcherid INTEGER,
+      postclass TEXT,
+      postid TEXT,
+      profilephoto TEXT,
+      quantity INTEGER,
+      timestamp TEXT,
+      translatedtextcontent TEXT,
+      umbrellatype TEXT,
+      userid TEXT,
+      username TEXT   
+    )`)
+
+    await db.execAsync(`CREATE TABLE IF NOT EXISTS donations(
+      id TEXT PRIMARY KEY,
+      geolocation TEXT,
+      ismatched INTEGER,
+      item TEXT,
+      matcherid INTEGER,
+      postclass TEXT,
+      postid TEXT,
+      profilephoto TEXT,
+      quantity INTEGER,
+      timestamp TEXT,
+      translatedtextcontent TEXT,
+      umbrellatype TEXT,
+      userid TEXT,
+      username TEXT 
+    )`)
+
+    await db.execAsync(`CREATE TABLE IF NOT EXISTS matches
+      requestid TEXT,
+      donationid TEXT,
+      donorack INTEGER,
+      matcherid INTEGER,
+      matchtime TEXT,
+      requesterack INTEGER,
+      PRIMARY KEY (requestid, donationid)
+      `)
+console.log("Tables created successfully")
 }
 
 const styles = StyleSheet.create({
