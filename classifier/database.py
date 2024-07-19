@@ -53,7 +53,8 @@ def insertData():
         (str(uuid.uuid4()), str(uuid.uuid4()), 'user7', None, UNSET_CLASSIFIER_ID, (40.7128, -74.0060), False, ['url7'], 'Safety and protection gear required for volunteers.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
         (str(uuid.uuid4()), str(uuid.uuid4()), 'user8', None, UNSET_CLASSIFIER_ID, (37.7749, -122.4194), False, ['url8'], 'Request for evacuation assistance for elderly residents.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
         (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'Searching for missing person: John Doe, last seen near the river.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'I have first aid kits to donate, please contact if u need them', datetime.utcnow(), datetime.utcnow(),'en',-1,True)
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'I have first aid kits to donate, please contact if u need them', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'यह एक परीक्षण वाक्य है', datetime.utcnow(), datetime.utcnow(),'hin_Deva',-1,False)
     ]
 
     for post in posts:
