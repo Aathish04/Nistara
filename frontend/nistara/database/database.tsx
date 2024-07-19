@@ -59,7 +59,7 @@ export class dbClient {
     }
 
     let payload: any
-    if(language=='eng_Latn' || language=='en'){
+    if(language=='eng_Latn' || language=='en'){ // en cause currently db has en
     payload = {
         ...data,
         translator: -1,
@@ -108,7 +108,7 @@ export class dbClient {
       return { message: 'Post Fetch Successful', result: posts };
     } catch (e) {
       console.error('Failed fetching all posts:', e);
-      return { message: 'Failed fetching all posts' };
+      return { message: 'Failed fetching all posts', result: null };
     }
   }
 
@@ -134,7 +134,7 @@ export class dbClient {
       return { message: 'Request Posts Fetch Successful', result: requests};
     } catch (e) {
       console.error('Failed fetching all request posts:', e);
-      return { message: 'Failed fetching all request posts' };
+      return { message: 'Failed fetching all request posts', result: null };
     }
   }
 
@@ -160,7 +160,7 @@ export class dbClient {
       return { message: 'Donation Posts Fetch Successful', result: donations };
     } catch (e) {
       console.error('Failed fetching all donation posts:', e);
-      return { message: 'Failed fetching all donation posts' };
+      return { message: 'Failed fetching all donation posts', result: null };
     }
   }
 
@@ -177,7 +177,7 @@ export class dbClient {
       return { message: 'Information Posts Fetch Successful', result: information };
     } catch (e) {
       console.error('Failed fetching all information posts:', e);
-      return { message: 'Failed fetching all information posts' };
+      return { message: 'Failed fetching all information posts', result: null };
     }
   }
 
@@ -215,10 +215,10 @@ export class dbClient {
       let response = await axios.post(`${ASTRA_BASE_URL}/api/rest/v2/cql?keyspaceQP=${ASTRA_DB_KEYSPACE}`, query, {headers})
       const userData = response.data.data[0]
       if(userData.password === password) return { message: 'Valid User', user: userData}
-      else return { message: 'Invalid Credentials. Please try again.'}
+      else return { message: 'Invalid Credentials. Please try again.', user: null}
     }catch(e){
       console.error('User not found', e);
-      return {message: 'Invalid Credentials. Please try again.'}
+      return {message: 'Invalid Credentials. Please try again.', user: null}
     }
 
   }

@@ -3,9 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Image, ScrollView
 // import Carousel from 'react-native-snap-carousel';
 import { Ionicons } from '@expo/vector-icons';
 import { dbClient } from '../database/database';
+import { SQLiteClient } from '../sqlite/localdb';
 import { images } from '../constants/Images';
 
-import { posts } from '../sampledata/posts';
+// import { posts } from '../sampledata/posts';
 
 const { width: viewportWidth } = Dimensions.get('window');
 
@@ -112,36 +113,43 @@ const AllPostsScreen = ({navigation}: {navigation:any}) =>{
 
   }
 
-  // const [posts, setPosts] = useState<any>([]);
+  const [posts, setPosts] = useState<any>([]);
   const [refreshing, setRefreshing] = useState(false);
   const client = new dbClient();
+  const sqliteClient = new SQLiteClient();
 
-  // const fetchPosts = useCallback(async () => {
-  //   try {
-  //     const response = await client.getPosts();
-  //     console.log(response.result)
-  //     setPosts(response.result);
-  //   } catch (error) {
-  //     console.error('Error fetching posts: ', error);
-  //   }
-  // }, []);
+  const fetchPosts = useCallback(async () => {
+    try {
+      const response = await client.getPosts();
+      console.log(response.result)
+      if(response.result){
+        await sqliteClient.validateAddAndUpdatePosts(response.result, false)
+      }
+      const localPosts = await sqliteClient.getPosts()
+      if(localPosts.result){
+        setPosts(response.result)
+      }
+    } catch (error) {
+      console.error('Error fetching posts: ', error);
+    }
+  }, []);
 
-  //   useEffect(() => {
-  //     fetchPosts();
-  //   }, [fetchPosts]);
+    useEffect(() => {
+      fetchPosts();
+    }, [fetchPosts]);
 
-  // const onRefresh = useCallback(() => {
-  //   setRefreshing(true);
-  //   fetchPosts().then(() => setRefreshing(false));
-  //   }, [fetchPosts]);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchPosts().then(() => setRefreshing(false));
+    }, [fetchPosts]);
 
     return (
       <View style={{flex:1}}>
       <ScrollView
         style={{ flex: 1 }}
-        // refreshControl={
-        //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        // }
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
           {posts.map((post: any, index: any) => (
             <PostCard post={post} key={index}/>
@@ -214,158 +222,3 @@ const styles = StyleSheet.create({
     marginRight: 10
   }
 })
-
-
-// interface PostCard {
-//   profilephoto: string | null;
-//   username: string;
-//   timestamp: string;
-//   tag: string;
-//   textualinfo: string;
-//   multimediaurl: string[];
-//   isclassified: boolean;
-// }
-
-// interface PostCardProps {
-//   post: PostCard;
-// }
-
-// const PostCard: React.FC<PostCardProps> = (props) => {
-//   const { profilephoto, username, textualinfo, multimediaurl, timestamp, isclassified, tag} = props.post;
-
-//   return (
-//     <View style={styles.card}>
-//       <View style={styles.header}>
-//         <Image
-//           source={profilephoto ? { uri: profilephoto } : require('../assets/profile/dog.png')}
-//           style={styles.profilePhoto}
-//         />
-//         <View style={styles.headerText}>
-//           <Text style={styles.username}>{username}</Text>
-//           <Text style={styles.timestamp}>{new Date(timestamp).toLocaleString()}</Text>
-//         </View>
-//       </View>
-//       <View style={styles.tagContainer}>
-//         <TouchableOpacity style={styles.tagButton}>
-//           <Text style={styles.tagText}>{tag}</Text>
-//         </TouchableOpacity>
-//       </View>
-//       <Text style={styles.textualInfo}>{textualinfo}</Text>
-//       {multimediaurl && multimediaurl.length > 0 && (
-//         <Image
-//           source={{ uri: multimediaurl[0] }}
-//           style={styles.multimedia}
-//         />
-//       )}
-//     </View>
-//   );
-// };
-
-// const Post: React.FC = () => {
-//   const [posts, setPosts] = useState<PostCard[]>([]);
-//   const [refreshing, setRefreshing] = useState(false);
-//   const database = new dbClient();
-
-//   const fetchPosts = useCallback(async () => {
-//     try {
-//       // const res = await database.getPosts();
-//       // const post_list = res.result as Post[];
-//       // setPosts(post_list);
-//       // console.log(post_list);
-//     } catch (error) {
-//       console.error('Error fetching posts: ', error);
-//     }
-//   }, [database]);
-
-//   useEffect(() => {
-//     fetchPosts();
-//   }, []);
-
-//   const onRefresh = useCallback(() => {
-//     setRefreshing(true);
-//     fetchPosts().then(() => setRefreshing(false));
-//   }, [fetchPosts]);
-
-//   return (
-//     <ScrollView
-//       style={{ flex: 1 }}
-//       refreshControl={
-//         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-//       }
-//     >
-//       {posts.map((post, index) => (
-//         <PostCard post={post} key={index} />
-//       ))}
-//       <PostCard post={{
-//         profilephoto: null,
-//         username: "user1",
-//         textualinfo: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-//         multimediaurl: ["https://example.com/image.jpg"],
-//         timestamp: "2024-07-13T09:24:16.672Z",
-//         isclassified: true,
-//         tag: "REQUEST_ITEM"
-//       }} />
-//     </ScrollView>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   card: {
-//     backgroundColor: 'white',
-//     borderRadius: 10,
-//     padding: 15,
-//     marginVertical: 10,
-//     marginHorizontal: 20,
-//     shadowColor: '#000',
-//     shadowOffset: { width: 0, height: 2 },
-//     shadowOpacity: 0.1,
-//     shadowRadius: 5,
-//     elevation: 5,
-//   },
-//   header: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginBottom: 10,
-//   },
-//   profilePhoto: {
-//     width: 70,
-//     height: 70,
-//     borderRadius: 20,
-//   },
-//   headerText: {
-//     marginLeft: 10,
-//   },
-//   username: {
-//     fontWeight: 'bold',
-//     fontSize: 16,
-//   },
-//   timestamp: {
-//     color: 'gray',
-//     fontSize: 12,
-//   },
-//   tagContainer: {
-//     marginBottom: 10,
-//   },
-//   tagButton: {
-//     alignSelf: 'flex-start',
-//     backgroundColor: '#95A8EF',
-//     borderRadius: 5,
-//     paddingVertical: 5,
-//     paddingHorizontal: 10,
-//   },
-//   tagText: {
-//     color: 'white',
-//     fontSize: 14,
-//   },
-//   textualInfo: {
-//     marginBottom: 10,
-//     fontSize: 14,
-//   },
-//   multimedia: {
-//     width: '100%',
-//     height: 200,
-//     borderRadius: 10,
-//   },
-// });
-
-// export default Post;

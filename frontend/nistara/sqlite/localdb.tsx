@@ -156,7 +156,7 @@ export class SQLiteClient{
                     translatedtextcontent: post.translatedtextcontent
                 }))
             return {message: 'Posts retrieval successful', result: posts}
-        }else return {message: 'No posts to retrieve', result: []}
+        }else return {message: 'No posts to retrieve', result: null}
         
     }
 
@@ -170,8 +170,8 @@ export class SQLiteClient{
         // repeat till all posts are parsed
     try{
         const response = await this.getPosts();
-        const postsLocal: any[] = response.result
-        if(postsLocal.length==0){
+        const postsLocal: any[] | null = response.result
+        if(postsLocal==null || postsLocal.length==0){
             // add all posts received 
             posts.map(async(post:any)=>{
                 await this.addPost(post, mesh)
@@ -199,7 +199,8 @@ export class SQLiteClient{
     }
 
     async clearPostsTable(){
-
+        await this.db.execAsync(`DELETE FROM posts`);
+        console.log("All rows deleted successfully");
     }
     
 }
