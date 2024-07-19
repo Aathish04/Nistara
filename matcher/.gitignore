@@ -162,3 +162,5 @@ cython_debug/
 #.idea/
 
 models--sentence-transformers--all-mpnet-base-v2
+
+all-mpnet-base-v2
