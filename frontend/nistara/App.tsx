@@ -40,8 +40,8 @@ import WritePost from './screens/WritePost';
 import YourProfileScreen from './screens/YourProfileScreen';
 
 // sqlite --local store
-import { SQLiteProvider, useSQLiteContext, type SQLiteDatabase } from 'expo-sqlite';
-
+import { SQLiteProvider } from 'expo-sqlite';
+import { SQLiteClient } from './sqlite/localdb';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -213,7 +213,7 @@ export default function App() {
   }
 
   let actualview = (
-  <SQLiteProvider databaseName='nistara.db' onInit={createTable}>
+  <SQLiteProvider databaseName='nistara.db' onInit={SQLiteClient.initDatabase}>
     <UserProvider>
       <NavigationContainer>
         <Stack.Navigator>
@@ -266,73 +266,6 @@ export default function App() {
   )
   
   return actualview
-}
-
-async function createTable(db: SQLiteDatabase){
-    await db.execAsync(`CREATE TABLE IF NOT EXISTS posts (
-      id TEXT PRIMARY KEY,
-      geolocation TEXT,
-      multimediaurl TEXT,
-      textcontent TEXT,
-      timestamp TEXT,
-      lastupdatetimestamp TEXT,
-      userid TEXT,
-      username TEXT,
-      profilephoto TEXT,
-      language TEXT,
-      classifier INTEGER,
-      isclassified INTEGER,
-      class TEXT,
-      translator INTEGER,
-      istranslated INTEGER,
-      translatedtextcontent TEXT,
-      mesh INTEGER
-    )`)
-
-    await db.execAsync(`CREATE TABLE IF NOT EXISTS requests (
-      id TEXT PRIMARY KEY,
-      geolocation TEXT,
-      ismatched INTEGER,
-      item TEXT,
-      matcherid INTEGER,
-      postclass TEXT,
-      postid TEXT,
-      profilephoto TEXT,
-      quantity INTEGER,
-      timestamp TEXT,
-      translatedtextcontent TEXT,
-      umbrellatype TEXT,
-      userid TEXT,
-      username TEXT   
-    )`)
-
-    await db.execAsync(`CREATE TABLE IF NOT EXISTS donations(
-      id TEXT PRIMARY KEY,
-      geolocation TEXT,
-      ismatched INTEGER,
-      item TEXT,
-      matcherid INTEGER,
-      postclass TEXT,
-      postid TEXT,
-      profilephoto TEXT,
-      quantity INTEGER,
-      timestamp TEXT,
-      translatedtextcontent TEXT,
-      umbrellatype TEXT,
-      userid TEXT,
-      username TEXT 
-    )`)
-
-    await db.execAsync(`CREATE TABLE IF NOT EXISTS matches
-      requestid TEXT,
-      donationid TEXT,
-      donorack INTEGER,
-      matcherid INTEGER,
-      matchtime TEXT,
-      requesterack INTEGER,
-      PRIMARY KEY (requestid, donationid)
-      `)
-console.log("Tables created successfully")
 }
 
 const styles = StyleSheet.create({
