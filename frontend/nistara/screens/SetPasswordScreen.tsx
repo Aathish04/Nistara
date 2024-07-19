@@ -1,11 +1,14 @@
 import React, { useState }from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ActivityIndicator, ScrollView, SafeAreaView } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import {Ionicons} from '@expo/vector-icons'
 import { images } from '../constants/Images'
 import { sha256 } from 'js-sha256';
 import * as SecureStore from 'expo-secure-store';
 import { dbClient } from '../database/database';
 import SafeViewAndroid from '../components/SafeViewAndroid';
+
+import { languages } from '../constants/Languages';
 
 const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>{
     const {userInfo} = route.params
@@ -16,7 +19,11 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [language, setLanguage] = useState(languages["English"])
+    console.log(language)
 
+
+    const languageItems = Object.keys(languages).map(key => ({ label: key, value: languages[key] }));
     const handleCreateYourAccount = async () => {
         if (password !== confirmPassword) {
           setErrorMessage('Passwords do not match');
@@ -31,7 +38,8 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
             const userPayload = {
               ...userInfo,
               password,
-              userID
+              userID,
+              language
             };
             const userPayloadString = JSON.stringify(userPayload);
             await SecureStore.setItemAsync('User', userPayloadString);
@@ -48,7 +56,9 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
     }
     return(
         <SafeAreaView style={SafeViewAndroid.AndroidSafeArea}>
+            
             <View style={styles.container}>
+            
             <View style={styles.header}>
                 <TouchableOpacity
                     style={styles.backButton}
@@ -62,15 +72,29 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
                     <Text style={styles.headerText}>{userInfo.userName}</Text>
                 </View>
             </View>
+            <ScrollView>
             <View style={styles.content}>
                 <View style={styles.contactSection}>
                         <Ionicons name="mail-open" size={24} color="#ccc"/>
                         <Text style={styles.contactInfo}>{userInfo.email}</Text>
                 </View>
-                <ScrollView>
+                
+                <Text style={styles.label}>Your Preferred Language</Text>
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={language}
+                        onValueChange={(itemValue) => setLanguage(itemValue)}
+                        style={styles.picker}
+                    >
+                        {languageItems.map(item => (
+                            <Picker.Item label={item.label} value={item.value} key={item.value} />
+                        ))}
+                    </Picker>
+                </View>
+                
                     <Text style={styles.passwordMessage}>Create a strong password to keep your account secure.</Text>
                     <View style={styles.inputSection}>
-                        <Text style={styles.label}>Password</Text>
+                        <Text style={styles.label}>Set Password</Text>
                         <TextInput
                         placeholder="Enter Password"
                         secureTextEntry
@@ -96,7 +120,7 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
                         {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
                         <Text style={styles.infoText}>You can sign in to your account with your registered email and password.</Text>     
                     </View>
-                </ScrollView>
+                
             </View>
             <View style={{alignItems: 'center'}}>
                 {loading ? (
@@ -107,11 +131,9 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
                     </TouchableOpacity>
                 )}
             </View>
-            
-                
-
-            
+            </ScrollView>  
         </View>
+        
         </SafeAreaView>
     )
 }
@@ -162,7 +184,7 @@ const styles = StyleSheet.create({
     },
     content:{
         paddingHorizontal: 15,
-        paddingVertical: 50
+        paddingVertical: 30
     },
     contactSection:{
         flexDirection: "row",
@@ -208,8 +230,7 @@ const styles = StyleSheet.create({
     infoText:{
         color: "#959595",
         fontWeight: "bold",
-        fontSize: 16,
-        marginBottom: 40
+        fontSize: 16
     },
     errorText: {
         color: 'red',
@@ -217,6 +238,17 @@ const styles = StyleSheet.create({
     },
     label:{
         paddingBottom: 10,
-        fontSize: 16
-    }
+        fontSize: 16,
+        fontWeight: "bold"
+    },
+    pickerContainer: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        marginBottom: 30,
+    },
+    picker: {
+        height: 50,
+        width: '100%',
+    },
 })

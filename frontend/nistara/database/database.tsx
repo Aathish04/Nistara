@@ -12,7 +12,8 @@ interface User {
   maskedNumber: string, 
   email: string,
   phone: string,
-  password: string
+  password: string,
+  language: string
 }
 
 const cred = new Credential();
@@ -35,25 +36,46 @@ export class dbClient {
     };
   }
 
-  async addPost(userID: string, username: string, profilephoto:string, textualInfo: string, multimediaURL: string[], timestamp: number, geoLocation: [number, number]) {
-    let postID: string = sha256(String(userID) + textualInfo + String(multimediaURL) + timestamp + String(geoLocation)).toString();
+  async addPost(userid: string, username: string, profilephoto:string, textcontent: string, multimediaurl: string[], timestamp: number, geoLocation: [number, number], language:string) {
+    let postID: string = sha256(String(userid) + textcontent + String(multimediaurl) + timestamp + String(geoLocation)).toString();
     const geoLocationStr = `(${geoLocation[0]},${geoLocation[1]})`
     console.log(geoLocationStr)
-    const data = {
-      postid: postID,
-      userid: userID,
-      username: username,
-      profilephoto: null,
-      textualinfo: textualInfo,
-      multimediaurl: multimediaURL,
-      timestamp : timestamp,
+    let data: any;
+
+    data = {
+      id: postID,
       geolocation: geoLocationStr,
+      multimediaurl,
+      textcontent,
+      timestamp : timestamp,
+      lastupdatetimestamp: timestamp,
+      userid,
+      username,
+      profilephoto,
+      language,
       classifier: -1,
       isclassified: false,
-      tag:null
-    };
+      class: null
+    }
+
+    let payload: any
+    if(language=='eng_Latn' || language=='en'){ // en cause currently db has en
+    payload = {
+        ...data,
+        translator: -1,
+        istranslated: true,
+        translatedtextcontent: textcontent
+      };
+    }else{
+      payload = {
+        ...data,
+        translator: -1,
+        istranslated: false,
+        translatedtextcontent: null
+      }
+    }
     try {
-      await axios.post(`${this.baseUrl}/posts`, data, { headers: this.headers });
+      await axios.post(`${this.baseUrl}/posts`, payload, { headers: this.headers });
       console.log('Post added successfully');
       return { message: 'Post Added Successfully' };
     } catch (e) {
@@ -66,23 +88,27 @@ export class dbClient {
     try {
       let response = await axios.get(`${this.baseUrl}/posts/rows`, { headers: this.headers });
       const posts = response.data.data.map((post: any) => ({
-        postid: post.postid,
-        userid: post.userid,
-        textualinfo: post.textualinfo,
-        multimediaurl: post.multimediaurl,
-        timestamp: post.timestamp,
+        id: post.id,
         geolocation: post.geolocation,
+        multimediaurl: post.multimediaurl,
+        textcontent: post.textcontent,
+        timestamp: post.timestamp,
+        lastupdatetimestamp: post.lastupdatetimestamp,
+        userid: post.userid,
+        username: post.username,
+        profilephoto: post.profilephoto,
+        language: post.language,
         classifier: post.classifier,
         isclassified: post.isclassified,
-        profilephoto: post.profilephoto,
-        tag: post.tag,
-        username: post.username
-
+        class: post.class,
+        translator: post.translator,
+        istranslated: post.istranslated,
+        translatedtextcontent: post.translatedtextcontent
       }));
       return { message: 'Post Fetch Successful', result: posts };
     } catch (e) {
       console.error('Failed fetching all posts:', e);
-      return { message: 'Failed fetching all posts' };
+      return { message: 'Failed fetching all posts', result: null };
     }
   }
 
@@ -90,20 +116,25 @@ export class dbClient {
     try {
       let response = await axios.get(`${this.baseUrl}/requests/rows`, { headers: this.headers });
       const requests = response.data.data.map((request: any)=>({
-        postID: request.postid,
-        requestID: request.requestid,
-        requestType: request.requesttype,
+        id: request.id,
+        umbrellatype: request.umbrellatype,
         item: request.item,
         quantity: request.quantity,
-        class: request.class,
-        userID: request.userid,
-        geoLocation: request.geoLocation,
-        isComplete: request.iscomplete
+        postid: request.postid,
+        geolocation: request.geolocation,
+        translatedtextcontent: request.translatedtextcontent,
+        timestamp: request.timestamp,
+        postclass: request.postclass,
+        userid: request.userid,
+        username: request.username,
+        profilephoto: request.profilephoto,
+        matcherid: request.matcherid,
+        ismatched: request.ismatched
       }))
       return { message: 'Request Posts Fetch Successful', result: requests};
     } catch (e) {
       console.error('Failed fetching all request posts:', e);
-      return { message: 'Failed fetching all request posts' };
+      return { message: 'Failed fetching all request posts', result: null };
     }
   }
 
@@ -111,18 +142,25 @@ export class dbClient {
     try {
       let response = await axios.get(`${this.baseUrl}/donations/rows`, { headers: this.headers });
       const donations = response.data.data.map((donation:any)=>({
-        postID: donation.postid,
-        donationID: donation.donationid,
-        donatingItem: donation.donatingitem,
+        id: donation.id,
+        umbrellatype: donation.umbrellatype,
+        item: donation.item,
         quantity: donation.quantity,
-        geoLocation: donation.geolocation,
-        isComplete: donation.iscomplete,
-        userID: donation.userid
+        postid: donation.postid,
+        geolocation: donation.geolocation,
+        translatedtextcontent: donation.translatedtextcontent,
+        timestamp: donation.timestamp,
+        postclass: donation.postclass,
+        userid: donation.userid,
+        username: donation.username,
+        profilephoto: donation.profilephoto,
+        matcherid: donation.matcherid,
+        ismatched: donation.ismatched
       }))
       return { message: 'Donation Posts Fetch Successful', result: donations };
     } catch (e) {
       console.error('Failed fetching all donation posts:', e);
-      return { message: 'Failed fetching all donation posts' };
+      return { message: 'Failed fetching all donation posts', result: null };
     }
   }
 
@@ -130,16 +168,16 @@ export class dbClient {
     try {
       let response = await axios.get(`${this.baseUrl}/information/rows`, { headers: this.headers });
       const information = response.data.data.map((info: any)=>({
-        postID: info.postid,
-        userID: info.userid,
-        textualInfo: info.textualinfo,
-        multimediaURL: info.multimediaURL,
-        geoLocation: info.geolocation
+        postid: info.postid,
+        userid: info.userid,
+        textualinfo: info.textualinfo,
+        multimediaurl: info.multimediaurl,
+        geolocation: info.geolocation
       }))
       return { message: 'Information Posts Fetch Successful', result: information };
     } catch (e) {
       console.error('Failed fetching all information posts:', e);
-      return { message: 'Failed fetching all information posts' };
+      return { message: 'Failed fetching all information posts', result: null };
     }
   }
 
@@ -154,7 +192,8 @@ export class dbClient {
       maskednumber: user.maskedNumber, 
       email: user.email,
       phone: user.phone,
-      password: user.password
+      password: user.password,
+      language: user.language
     };
     try {
       await axios.post(`${this.baseUrl}/users`, newUser, { headers: this.headers });
@@ -174,13 +213,12 @@ export class dbClient {
         'X-Cassandra-Token': ASTRA_DB_APPLICATION_TOKEN,
       }
       let response = await axios.post(`${ASTRA_BASE_URL}/api/rest/v2/cql?keyspaceQP=${ASTRA_DB_KEYSPACE}`, query, {headers})
-      // console.log(response)
       const userData = response.data.data[0]
       if(userData.password === password) return { message: 'Valid User', user: userData}
-      else return { message: 'Invalid Credentials. Please try again.'}
+      else return { message: 'Invalid Credentials. Please try again.', user: null}
     }catch(e){
       console.error('User not found', e);
-      return {message: 'Invalid Credentials. Please try again.'}
+      return {message: 'Invalid Credentials. Please try again.', user: null}
     }
 
   }

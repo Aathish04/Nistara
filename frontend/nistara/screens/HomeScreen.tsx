@@ -7,7 +7,7 @@ import {Ionicons} from '@expo/vector-icons'
 const Tab = createMaterialTopTabNavigator();
 
 // component screen renders
-import Post from './PostScreen';
+import AllPostsScreen from './HomeAllPostsScreen';
 import ForYouScreen from './HomeForYouScreen';
 
 const HomeTopTabs = () =>{
@@ -30,7 +30,7 @@ const HomeTopTabs = () =>{
         >
             <Tab.Screen 
                 name="All"
-                component={Post}
+                component={AllPostsScreen}
             />
             <Tab.Screen 
                 name="For you"

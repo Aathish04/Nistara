@@ -1,6 +1,7 @@
 import React, { useState , useEffect} from 'react';;
 import { Text, TouchableOpacity, View, StyleSheet, Image, TextInput, SafeAreaView } from 'react-native';
 import {dbClient} from '../database/database';
+import { SQLiteClient } from "../sqlite/localdb";
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons'
 import SafeViewAndroid from '../components/SafeViewAndroid';
@@ -18,8 +19,10 @@ const WritePost = ({navigation}:{navigation: any}) => {
   
   
   const database = new dbClient();
+  const sqlClient = new SQLiteClient()
 
-  const { userID, userName, profileImage } = useUser();
+  const { userID, userName, profileImage, language } = useUser();
+  // console.log(userID, userName, profileImage, language)
   const userAvatar: any = images[profileImage];
 
 
@@ -39,10 +42,11 @@ const WritePost = ({navigation}:{navigation: any}) => {
     })();
   }, []);
 
-  const handlePost = async (userID:string,username:string,profilephoto: string, textualinfo:string) => {
+  const handlePost = async () => {
     let response;
     try{
-      response = await database.addPost(userID,username,profilephoto, textualinfo,['url'],Date.now(),[lat,long])
+      response = await database.addPost(userID, userName, profileImage, text, [] ,Date.now(), [lat,long], language)
+      await sqlClient.writePost(userID, userName, profileImage, text, [] ,Date.now(), [lat,long], language, false)
     }catch(e){
       if(response) setErrorMsg(response.message)
       console.error(e)
@@ -86,7 +90,7 @@ const WritePost = ({navigation}:{navigation: any}) => {
                       ...styles.button,
                       ...{ backgroundColor: '#95A8EF'},
                   }}
-                  onPress = {()=>{handlePost(userID, userName, profileImage, text)}}
+                  onPress = {()=>{handlePost()}}
                   >
                   <Text style={{ fontSize: 20, ... { color: '#FFFFFF' } }}>Post!</Text>
               </TouchableOpacity>
