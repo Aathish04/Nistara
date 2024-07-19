@@ -1,0 +1,4 @@
+IndicTransTokenizer @ git+https://github.com/VarunGumma/IndicTransTokenizer
+python-dotenv
+torch
+transformers
