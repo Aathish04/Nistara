@@ -259,7 +259,7 @@ export class SQLiteClient{
           username TEXT 
         )`)
     
-        await db.execAsync(`CREATE TABLE IF NOT EXISTS matches
+        await db.execAsync(`CREATE TABLE IF NOT EXISTS matches(
           requestid TEXT,
           donationid TEXT,
           donorack INTEGER,
@@ -267,7 +267,7 @@ export class SQLiteClient{
           matchtime TEXT,
           requesterack INTEGER,
           PRIMARY KEY (requestid, donationid)
-          `)
+        )`)
     console.log("Tables created successfully")
     }
 }
