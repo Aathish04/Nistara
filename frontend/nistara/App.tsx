@@ -42,6 +42,7 @@ import YourProfileScreen from './screens/YourProfileScreen';
 // sqlite --local store
 import { SQLiteProvider } from 'expo-sqlite';
 import { SQLiteClient } from './sqlite/localdb';
+import { MeshProvider } from './mesh/MeshContext';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -214,6 +215,7 @@ export default function App() {
 
   let actualview = (
   <SQLiteProvider databaseName='nistara.db' onInit={SQLiteClient.initDatabase}>
+    <MeshProvider>
     <UserProvider>
       <NavigationContainer>
         <Stack.Navigator>
@@ -250,6 +252,7 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
+    </MeshProvider>
     </SQLiteProvider>
   );
   let meshtestview = (
