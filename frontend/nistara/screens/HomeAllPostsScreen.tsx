@@ -129,12 +129,19 @@ const AllPostsScreen = ({navigation}: {navigation:any}) =>{
         setPosts(localPosts)
       }
 
-      const requestsResponse = await client.getRequestPosts();
-      if(requestsResponse.result){
-        await sqliteClient.validateAddAndUpdateRequests(requestsResponse.result)
-      }
-      const localRequests = await sqliteClient.getRequests()
-      console.log(localRequests)
+      // const requestsResponse = await client.getRequestPosts();
+      // if(requestsResponse.result){
+      //   await sqliteClient.validateAddAndUpdateRequests(requestsResponse.result)
+      // }
+      // const localRequests = await sqliteClient.getRequests()
+      // console.log(localRequests)
+
+      // const donationResponse = await client.getDonationPosts();
+      // if(donationResponse.result){
+      //   await sqliteClient.validateAddAndUpdateDonations(donationResponse.result)
+      // }
+      // const localDonations = await sqliteClient.getDonations()
+      // console.log(localDonations)
 
     } catch (error) {
       console.error('Error fetching posts: ', error);

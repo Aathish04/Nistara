@@ -45,6 +45,23 @@ export interface Request {
     username: string;
 }
 
+export interface Donation {
+    id: string;
+    geolocation: [number, number];
+    ismatched: boolean;
+    item: string;
+    matcherid: number;
+    postclass: string;
+    postid: string;
+    profilephoto: string;
+    quantity: number;
+    timestamp: number;
+    translatedtextcontent: string;
+    umbrellatype: string;
+    userid: string;
+    username: string;
+}
+
 export class SQLiteClient{
     db: SQLite.SQLiteDatabase;
 
@@ -326,6 +343,129 @@ export class SQLiteClient{
         await this.db.execAsync('VACUUM');
         console.log("All rows deleted successfully");
     }
+
+    // Add Donation
+    async addDonation(donation: Donation) {
+        await this.db.runAsync(
+            `INSERT INTO ${TABLES.mainDonations} (id, geolocation, ismatched, item, matcherid, postclass, postid, profilephoto, quantity, timestamp, translatedtextcontent, umbrellatype, userid, username) VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                donation.id,
+                JSON.stringify(donation.geolocation),
+                donation.ismatched ? 1 : 0,
+                donation.item,
+                donation.matcherid,
+                donation.postclass,
+                donation.postid,
+                donation.profilephoto,
+                donation.quantity,
+                donation.timestamp,
+                donation.translatedtextcontent,
+                donation.umbrellatype,
+                donation.userid,
+                donation.username
+            ]
+        );
+        console.log("Added donation successfully");
+    }
+
+    // Update Donation
+    async updateDonation(donation: Donation) {
+        await this.db.runAsync(
+            `UPDATE ${TABLES.mainDonations} SET 
+            geolocation = ?, 
+            ismatched = ?, 
+            item = ?, 
+            matcherid = ?, 
+            postclass = ?, 
+            postid = ?, 
+            profilephoto = ?, 
+            quantity = ?, 
+            timestamp = ?, 
+            translatedtextcontent = ?, 
+            umbrellatype = ?, 
+            userid = ?, 
+            username = ? 
+            WHERE id = ?`,
+            [
+                JSON.stringify(donation.geolocation),
+                donation.ismatched ? 1 : 0,
+                donation.item,
+                donation.matcherid,
+                donation.postclass,
+                donation.postid,
+                donation.profilephoto,
+                donation.quantity,
+                donation.timestamp,
+                donation.translatedtextcontent,
+                donation.umbrellatype,
+                donation.userid,
+                donation.username,
+                donation.id
+            ]
+        );
+    }
+
+    // Get Donations
+    async getDonations(): Promise<Donation[]> {
+        const allDonations = await this.db.getAllAsync(`SELECT * FROM ${TABLES.mainDonations}`);
+        let donations = allDonations.map((donation: any) => {
+            let typedDonation: Donation = {
+                id: donation.id,
+                geolocation: JSON.parse(donation.geolocation),
+                ismatched: donation.ismatched == 1,
+                item: donation.item,
+                matcherid: donation.matcherid,
+                postclass: donation.postclass,
+                postid: donation.postid,
+                profilephoto: donation.profilephoto,
+                quantity: donation.quantity,
+                timestamp: donation.timestamp,
+                translatedtextcontent: donation.translatedtextcontent,
+                umbrellatype: donation.umbrellatype,
+                userid: donation.userid,
+                username: donation.username
+            };
+            return typedDonation;
+        });
+        return donations;
+    }
+
+    // Validate and Add or Update Donations
+    async validateAddAndUpdateDonations(donations: Donation[]) {
+        try {
+            const donationsLocal = await this.getDonations();
+            if (donationsLocal.length == 0) {
+                donations.map(async (donation: Donation) => {
+                    await this.addDonation(donation);
+                });
+            } else {
+                const localDonationsMap = new Map(donationsLocal.map((donation: Donation) => [donation.id, donation]));
+
+                for (const donation of donations) {
+                    const localDonation = localDonationsMap.get(donation.id);
+
+                    if (!localDonation) {
+                        await this.addDonation(donation);
+                    } else {
+                        if (localDonation.timestamp !== donation.timestamp) {
+                            await this.updateDonation(donation);
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    // Clear Donations Table
+    async clearDonationsTable() {
+        await this.db.execAsync(`DELETE FROM ${TABLES.mainDonations}`);
+        await this.db.execAsync('VACUUM');
+        console.log("All rows deleted successfully");
+    }
+
 
     static async initDatabase(db: SQLite.SQLiteDatabase){
         await db.execAsync(`CREATE TABLE IF NOT EXISTS ${TABLES.mainPosts} (
