@@ -44,16 +44,19 @@ def insertData():
 
     # Data to be inserted
     posts = [
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user1', None, UNSET_CLASSIFIER_ID, (37.7749, -122.4194), False, ['url1'], 'Request for food and water supplies to assist affected families.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user2', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url2'], 'Urgent need for hygiene products including soap and sanitizers.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user3', None, UNSET_CLASSIFIER_ID, (40.7128, -74.0060), False, ['url3'], 'Emergency lighting and communication devices needed for affected areas.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user4', None, UNSET_CLASSIFIER_ID, (34.0522, -118.2437), False, ['url4'], 'Request for medicines and first aid kits.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user5', None, UNSET_CLASSIFIER_ID, (37.7749, -122.4194), False, ['url5'], 'Need tools and equipment for debris removal and rescue operations.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user6', None, UNSET_CLASSIFIER_ID, (34.0522, -118.2437), False, ['url6'], 'Request for clothing and shelter materials for displaced persons.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user7', None, UNSET_CLASSIFIER_ID, (40.7128, -74.0060), False, ['url7'], 'Safety and protection gear required for volunteers.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user8', None, UNSET_CLASSIFIER_ID, (37.7749, -122.4194), False, ['url8'], 'Request for evacuation assistance for elderly residents.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'Searching for missing person: John Doe, last seen near the river.', datetime.utcnow(), datetime.utcnow(),'en',-1,True),
-        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'I have first aid kits to donate, please contact if u need them', datetime.utcnow(), datetime.utcnow(),'en',-1,True)
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user1', None, UNSET_CLASSIFIER_ID, (37.7749, -122.4194), False, ['url1'], 'Request for food and water supplies to assist affected families.', datetime.utcnow(), datetime.utcnow(),'eng_Latn',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user2', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url2'], 'Urgent need for hygiene products including soap and sanitizers.', datetime.utcnow(), datetime.utcnow(),'eng_Latn',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user3', None, UNSET_CLASSIFIER_ID, (40.7128, -74.0060), False, ['url3'], 'Emergency lighting and communication devices needed for affected areas.', datetime.utcnow(), datetime.utcnow(),'eng_Latn',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user4', None, UNSET_CLASSIFIER_ID, (34.0522, -118.2437), False, ['url4'], 'Request for medicines and first aid kits.', datetime.utcnow(), datetime.utcnow(),'eng_Latn',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user5', None, UNSET_CLASSIFIER_ID, (37.7749, -122.4194), False, ['url5'], 'Need tools and equipment for debris removal and rescue operations.', datetime.utcnow(), datetime.utcnow(),'eng_Latn',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user6', None, UNSET_CLASSIFIER_ID, (34.0522, -118.2437), False, ['url6'], 'Request for clothing and shelter materials for displaced persons.', datetime.utcnow(), datetime.utcnow(),'eng_Latn',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user7', None, UNSET_CLASSIFIER_ID, (40.7128, -74.0060), False, ['url7'], 'Safety and protection gear required for volunteers.', datetime.utcnow(), datetime.utcnow(),'eng_Latn',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user8', None, UNSET_CLASSIFIER_ID, (37.7749, -122.4194), False, ['url8'], 'Request for evacuation assistance for elderly residents.', datetime.utcnow(), datetime.utcnow(),'eng_Latn',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'Searching for missing person: John Doe, last seen near the river.', datetime.utcnow(), datetime.utcnow(),'eng_Latn',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'I have first aid kits to donate, please contact if u need them', datetime.utcnow(), datetime.utcnow(),'eng_Latn',-1,True),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'यह एक परीक्षण वाक्य है', datetime.utcnow(), datetime.utcnow(),'hin_Deva',-1,False),
+        (str(uuid.uuid4()), str(uuid.uuid4()), 'user9', None, UNSET_CLASSIFIER_ID, (29.7604, -95.3698), False, ['url9'], 'தானம் செய்ய என்னிடம் உணவு உள்ளது', datetime.utcnow(), datetime.utcnow(),'tam_Taml',-1,False),
+
     ]
 
     for post in posts:
@@ -63,7 +66,7 @@ def insertData():
     logger.info("Inserted sample records.")
 
 def getUnclassifiedPostInformation():
-    query = f"SELECT * FROM main.POSTS WHERE (classifier IN (?,?)) AND isclassified=? and isTranslated=?LIMIT 1 ALLOW FILTERING"
+    query = f"SELECT * FROM main.POSTS WHERE (classifier IN (?,?)) AND isclassified=? and isTranslated=? LIMIT 1 ALLOW FILTERING"
     prepared_statement = session.prepare(query)
     row = session.execute(prepared_statement, (-1, INSTANCEID,False,True), trace=True)
     try:
