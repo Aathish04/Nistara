@@ -104,7 +104,8 @@ const styles = StyleSheet.create({
   loginButtonandContainer:{
     flex:1,
     alignItems:"center",
-    justifyContent:"space-around"
+    justifyContent:"space-around",
+    width:"80%"
   },
   button: {
     borderColor: '#FFFFFF',
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    width: "95%",
+    width: "100%",
     backgroundColor: '#FFFFFF'
   },
   buttonText:{

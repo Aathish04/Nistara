@@ -72,15 +72,15 @@ const AadhaarOnboarding = ({route, navigation}: {route:any, navigation: any}) =>
           </Text>
           <View style={styles.section}>
               <View style={styles.bulletBox} />
-              <Text style={styles.titleText}>Account Safety</Text>
+              <Text style={styles.titleText}>■ Account Safety</Text>
               <Text style={styles.descText}>
                   By using Aadhar, we boost security and reliability on our platform, ensuring your account is protected against any fraudulent attempts or unauthorized access.
               </Text>
           </View>
-          <View style={{paddingBottom: 60}}>
+          <View>
             <View style={styles.section}>
                 <View style={styles.bulletBox} />
-                <Text style={styles.titleText}>Data Safety And Trust</Text>
+                <Text style={styles.titleText}>■ Data Safety And Trust</Text>
                 <Text style={styles.descText}>
                 Your data is important to us, and safeguarding it is our top priority. Using Aadhaar helps us keep your personal information secure.
                 </Text>
@@ -104,61 +104,65 @@ const AadhaarOnboarding = ({route, navigation}: {route:any, navigation: any}) =>
 
 const styles = StyleSheet.create({
       container: {
-        paddingTop: 30,
-        paddingHorizontal: 10,
-        paddingBottom: 20
+        flex:1
       },
       header: {
-        paddingHorizontal: 10
+        marginVertical:"5%",
+        marginHorizontal:"5%"
       },
     headerText: {
         fontSize: 26,
         fontWeight: 'bold',
-        paddingVertical: 20,
-        paddingLeft: 10
+        
+        // paddingLeft: 10
     },
     descriptionText: {
         fontSize: 16,
         color: '#666',
         lineHeight: 24,
-        paddingHorizontal: 20,
-        paddingBottom: 30
+        marginHorizontal:"5%",
+        marginVertical:"5%"
       },
       section: {
-        paddingBottom: 20,
-        paddingLeft: 40,
-        position: 'relative'
+        // paddingBottom: 20,
+        // paddingLeft: 40,
+        // position: 'relative'
+        marginHorizontal:"5%",
+        marginVertical:"5%"
       },
       bulletBox: {
-        position: 'absolute',
-        top: 10,
-        left: 20, 
-        width: 8, 
-        height: 8, 
-        backgroundColor: '#000'
+        // position: 'absolute',
+        // top: 10,
+        // left: 20, 
+        // width: 8, 
+        // height: 8, 
+        // backgroundColor: '#000'
       },
       titleText: {
         fontSize: 18,
         fontWeight: 'bold',
-        paddingBottom: 7,
-        paddingLeft: 20
+        // paddingBottom: 7,
+        // paddingLeft: 20
+        marginHorizontal:"1%"
       },
       descText: {
         fontSize: 15,
         color: '#666',
+        textAlign:"justify",
         lineHeight: 24,
-        paddingHorizontal: 20,
-        paddingRight: 25
+        // paddingHorizontal: 20,
+        // paddingRight: 25
       },
       button: {
-        paddingBottom: 14,
-        paddingVertical: 14,
+        // paddingBottom: 14,
+        // paddingVertical: 14,
         borderColor: '#95A8EF',
         borderWidth: 2,
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        width: "90%"
+        width: "90%",
+        height:"35%"
     }
       
   });

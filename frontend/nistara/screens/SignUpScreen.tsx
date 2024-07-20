@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, SafeAreaView } from 'react-native';
 import {Ionicons} from '@expo/vector-icons'
 import SafeViewAndroid from '../components/SafeViewAndroid';
+// import { aadhaarInfo } from '../sampledata/data';
 // import { aadhaarInfo } from '../data';
 
 type Address = {
@@ -115,24 +116,25 @@ const SignUpScreen = ({route, navigation}:{route:any, navigation:any})=>{
     return(
         <SafeAreaView style={SafeViewAndroid.AndroidSafeArea}>
         <View style={styles.container}>
+            <View style={styles.circleView}></View>
             <View style={styles.header}>
-                <View style={styles.circleView}></View>
                 <Image source={{ uri: 'data:image/jpeg;base64,'+aadhaarInfo.photo }} style={styles.aadhaarPhoto} />
                 <View style={styles.headerContent}>
                     <Text style={styles.headerText}>Welcome,</Text>
                     <Text style = {styles.userNameText}>{userName}</Text>
                 </View>
             </View>
-            <View style={styles.userDetails}>
-                <View style={styles.contactSection}>
+            <View style={styles.contactSection}>
                     <Ionicons name="call" size={22} color="#ccc"/>
                     <Text style={styles.contactInfo}>+91 {phone}</Text>
                 </View>
-                <View style={styles.contactSection}>
-                    <Ionicons name="mail-open" size={22} color="#ccc"/>
-                    <Text style={styles.contactInfo}>{email}</Text>
-                </View>
-                <View style={styles.section}>
+            <View style={styles.contactSection}>
+                <Ionicons name="mail-open" size={22} color="#ccc"/>
+                <Text style={styles.contactInfo}>{email}</Text>
+            </View>
+
+            <View style={styles.userDetails}>
+                <View>
                     <View style={styles.sectionHeader}>
                         <Ionicons name="location" size={24} color="#95A8EF" />
                         <Text style={styles.sectionHeaderTitle}>Address</Text>
@@ -144,7 +146,7 @@ const SignUpScreen = ({route, navigation}:{route:any, navigation:any})=>{
                         <Text style={styles.sectionText}>Pin: {displayAddress.pin}</Text>
                     </View>
                 </View>
-                <View style={styles.section}>
+                <View>
                     <View style={styles.sectionHeader}>
                         <Ionicons name="calendar" size={24} color="#95A8EF" />
                         <Text style={styles.sectionHeaderTitle}>Date Of Birth</Text>
@@ -153,7 +155,7 @@ const SignUpScreen = ({route, navigation}:{route:any, navigation:any})=>{
                         <Text style={styles.sectionText}>{aadhaarInfo.dateOfBirth}</Text>
                     </View>
                 </View>
-                <View style={styles.section}>
+                <View>
                     <View style={styles.sectionHeader}>
                         <Ionicons name="transgender" size={24} color="#95A8EF" />
                         <Text style={styles.sectionHeaderTitle}>Gender</Text>
@@ -162,7 +164,7 @@ const SignUpScreen = ({route, navigation}:{route:any, navigation:any})=>{
                         <Text style={styles.sectionText}>{aadhaarInfo.gender}</Text>
                     </View>
                 </View>
-                <View style={styles.section}>
+                <View>
                     <View style={styles.sectionHeader}>
                         <Ionicons name="person-add" size={24} color="#95A8EF" />
                         <Text style={styles.sectionHeaderTitle}>Aadhaar Number</Text>
@@ -172,7 +174,7 @@ const SignUpScreen = ({route, navigation}:{route:any, navigation:any})=>{
                     </View>
                 </View>
             </View>
-            <View style={{alignItems: 'center', paddingTop: 30}}>
+            <View style={styles.buttonContainer}>
                 <TouchableOpacity
                 style={{
                     ...styles.button,
@@ -190,13 +192,13 @@ const SignUpScreen = ({route, navigation}:{route:any, navigation:any})=>{
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 30,
-        paddingHorizontal: 10,
-        paddingBottom: 20
+        flex:1
       },
       header: {
+        padding:"10%",
         flexDirection: "row",
-        paddingHorizontal: 10
+        flex:1,
+        alignItems:"center"
       },
     circleView:{
         marginLeft: -140,
@@ -205,79 +207,75 @@ const styles = StyleSheet.create({
         borderRadius: 300,
         width: 250,
         height: 255,
-        opacity: 0.4
+        opacity: 0.4,
+        position:"absolute"
     },
     aadhaarPhoto:{
-        zIndex: 1,
         borderRadius: 100,
         width: 105,
         height: 105,
-        marginLeft: -70,
-        top: 5
     },
     headerText:{
         fontSize: 28,
         fontWeight: "bold",
-        color: "#95A8EF"
+        color: "#95A8EF",
+        textAlign:"right"
     },
     userNameText:{
         fontSize: 22,
-        paddingTop: 5,
-        flexWrap: 'wrap',
-        fontWeight: "condensedBold"
+        flexWrap: "wrap",
+        fontWeight: "condensedBold",
+        textAlign:"right"
     },
     headerContent:{
         flexDirection: "column",
-        width: 220,
-        paddingLeft: 25,
-        paddingVertical: 10,
-        paddingRight: 10
+        flex:2
     },
     userDetails:{
         flexDirection: "column",
-        paddingTop: 50,
-        paddingHorizontal: 20
+        flex:5,
+        justifyContent:"space-around",
+        marginHorizontal:"10%"
     },
     contactSection:{
         flexDirection: "row",
-        paddingBottom: 15
+        marginVertical:"1%",
+        // justifyContent:"space-around",
+        marginHorizontal:"10%",
+        gap:10
+        
     },
     contactInfo:{
         color: "#959595",
-        marginLeft: 25,
         fontWeight: "bold",
         fontSize: 15
     },
-    section:{
-        paddingVertical: 20
-    },
     sectionHeader:{
-        flexDirection: "row"
+        flexDirection: "row",
+        gap:10
     },
     sectionHeaderTitle:{ 
-        paddingLeft: 25,
         fontSize: 18,
         fontWeight: "bold"
     },
     sectionContent:{
-        paddingTop: 5,
-        paddingLeft: 50,
+        marginLeft:"12%"
     },
     sectionText:{
         color: "#959595",
         fontWeight: "bold",
         flexWrap: 'wrap',
-        width: 250
+        width: "90%"
     },
+    buttonContainer:{alignItems: 'center',flex:1},
     button: {
-        paddingBottom: 14,
-        paddingVertical: 14,
         borderColor: '#95A8EF',
         borderWidth: 2,
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        width: "90%"
+        width: "90%",
+        height: "60%"
     }
 })
 
