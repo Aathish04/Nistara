@@ -2,6 +2,17 @@ import axios from 'axios';
 import { sha256 } from 'js-sha256';
 import { Credential } from './env';
 
+
+
+export enum  TABLES{
+  mainPosts = "main.posts",
+  mainRequests = "main.requests",
+  mainDonations = "main.donations",
+  mainMatches = "main.matches",
+  mainUsers = "main.users"
+};
+
+
 interface User {
   userID: string,
   userName: string,
@@ -207,7 +218,7 @@ export class dbClient {
 
   async getUser(email: string, password: string){
     try{
-      const query: string= `SELECT * from main.users WHERE email = '${email}' ALLOW FILTERING;`
+      const query: string= `SELECT * from ${TABLES.mainUsers} WHERE email = '${email}' ALLOW FILTERING;`
       const headers = {
         'Content-Type': 'text/plain',
         'X-Cassandra-Token': ASTRA_DB_APPLICATION_TOKEN,
