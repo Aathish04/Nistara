@@ -175,6 +175,24 @@ export class dbClient {
     }
   }
 
+  async getMatches() {
+    try {
+      let response = await axios.get(`${this.baseUrl}/matches/rows`, { headers: this.headers });
+      const matches = response.data.data.map((match:any)=>({
+        requestid :match.requestid,
+        donationid : match.donationid,
+        donorack : match.donorack,
+        matcherid : match.matcherid,
+        matchtime : match.matchtime,
+        requesterack : match.requesterack,
+      }))
+      return { message: 'Matches Fetch Successful', result: matches };
+    } catch (e) {
+      console.error('Failed fetching all Matches:', e);
+      return { message: 'Failed fetching all Matches', result: null };
+    }
+  }
+
   async getInformationPosts() {
     try {
       let response = await axios.get(`${this.baseUrl}/information/rows`, { headers: this.headers });

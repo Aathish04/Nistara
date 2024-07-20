@@ -62,6 +62,15 @@ export interface Donation {
     username: string;
 }
 
+export interface Match {
+    requestid :string,
+    donationid : string,
+    donorack : boolean,
+    matcherid : number,
+    matchtime : string,
+    requesterack : boolean,
+}
+
 export class SQLiteClient{
     db: SQLite.SQLiteDatabase;
 
@@ -462,6 +471,95 @@ export class SQLiteClient{
     // Clear Donations Table
     async clearDonationsTable() {
         await this.db.execAsync(`DELETE FROM ${TABLES.mainDonations}`);
+        await this.db.execAsync('VACUUM');
+        console.log("All rows deleted successfully");
+    }
+
+    // Add Match
+    async addMatch(match: Match) {
+        await this.db.runAsync(
+            `INSERT INTO ${TABLES.mainMatches} (requestid, donationid, donorack, matcherid, matchtime, requesterack) VALUES (
+            ?, ?, ?, ?, ?, ?)`,
+            [
+                match.requestid,
+                match.donationid,
+                match.donorack ? 1 : 0,
+                match.matcherid,
+                match.matchtime,
+                match.requesterack ? 1 : 0
+            ]
+        );
+        console.log("Added match successfully");
+    }
+
+    // Update Match
+    async updateMatch(match: Match) {
+        await this.db.runAsync(
+            `UPDATE ${TABLES.mainMatches} SET 
+            donorack = ?, 
+            matcherid = ?, 
+            matchtime = ?, 
+            requesterack = ? 
+            WHERE requestid = ? AND donationid = ?`,
+            [
+                match.donorack ? 1 : 0,
+                match.matcherid,
+                match.matchtime,
+                match.requesterack ? 1 : 0,
+                match.requestid,
+                match.donationid
+            ]
+        );
+    }
+
+    // Get Matches
+    async getMatches(): Promise<Match[]> {
+        const allMatches = await this.db.getAllAsync(`SELECT * FROM ${TABLES.mainMatches}`);
+        let matches = allMatches.map((match: any) => {
+            let typedMatch: Match = {
+                requestid: match.requestid,
+                donationid: match.donationid,
+                donorack: match.donorack == 1,
+                matcherid: match.matcherid,
+                matchtime: match.matchtime,
+                requesterack: match.requesterack == 1
+            };
+            return typedMatch;
+        });
+        return matches;
+    }
+
+    // Validate and Add or Update Matches
+    async validateAddAndUpdateMatches(matches: Match[]) {
+        try {
+            const matchesLocal = await this.getMatches();
+            if (matchesLocal.length == 0) {
+                matches.map(async (match: Match) => {
+                    await this.addMatch(match);
+                });
+            } else {
+                const localMatchesMap = new Map(matchesLocal.map((match: Match) => [match.requestid + match.donationid, match]));
+
+                for (const match of matches) {
+                    const localMatch = localMatchesMap.get(match.requestid + match.donationid);
+
+                    if (!localMatch) {
+                        await this.addMatch(match);
+                    } else {
+                        if (localMatch.matchtime !== match.matchtime) {
+                            await this.updateMatch(match);
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    // Clear Matches Table
+    async clearMatchesTable() {
+        await this.db.execAsync(`DELETE FROM ${TABLES.mainMatches}`);
         await this.db.execAsync('VACUUM');
         console.log("All rows deleted successfully");
     }

@@ -143,6 +143,13 @@ const AllPostsScreen = ({navigation}: {navigation:any}) =>{
       // const localDonations = await sqliteClient.getDonations()
       // console.log(localDonations)
 
+      // const matchResponse = await client.getMatches();
+      // if(matchResponse.result){
+      //   await sqliteClient.validateAddAndUpdateMatches(matchResponse.result)
+      // }
+      // const localMatches = await sqliteClient.getMatches()
+      // console.log(localMatches)
+
     } catch (error) {
       console.error('Error fetching posts: ', error);
     }
