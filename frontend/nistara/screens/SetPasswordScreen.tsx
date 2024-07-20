@@ -56,7 +56,7 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
     }
     return(
         <SafeAreaView style={SafeViewAndroid.AndroidSafeArea}>
-            
+            <View style={styles.circleView}></View>
             <View style={styles.container}>
             
             <View style={styles.header}>
@@ -66,11 +66,10 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
                     >
                     <Ionicons name="chevron-back" size={24} color="black" />
                 </TouchableOpacity>
-                <View style={styles.circleView}></View>
-                <Image source = {profileImage} style={styles.avatar}/>
-                <View style={styles.headerContent}>
-                    <Text style={styles.headerText}>{userInfo.userName}</Text>
+                <View style={styles.avatarContainer}>
+                    <Image source = {profileImage} style={styles.avatar}/>
                 </View>
+                    <Text style={styles.headerText}>{userInfo.userName}</Text>
             </View>
             <ScrollView>
             <View style={styles.content}>
@@ -122,7 +121,7 @@ const SetPasswordScreen = ({route, navigation}: {route: any, navigation: any})=>
                     </View>
                 
             </View>
-            <View style={{alignItems: 'center'}}>
+            <View style={{alignItems: 'center',paddingBottom:"5%"}}>
                 {loading ? (
                     <ActivityIndicator size="large" color="#95A8EF" />
                 ) : (
@@ -142,13 +141,16 @@ export default SetPasswordScreen;
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 30,
-        paddingHorizontal: 10,
-        paddingBottom: 20
+        paddingTop: "10%",
+        flex:1
     },
-      header: {
+    header: {
         flexDirection: "row",
-        paddingHorizontal: 10
+        alignItems:"center",
+        justifyContent:"space-around",
+        width:'95%',
+        marginBottom:"5%"
+        // paddingHorizontal: 10
     },
     circleView:{
         marginLeft: -140,
@@ -157,30 +159,28 @@ const styles = StyleSheet.create({
         borderRadius: 300,
         width: 250,
         height: 255,
-        opacity: 0.4
+        opacity: 0.4,
+        position:"absolute"
     },
     backButton:{
-        zIndex:2
+        zIndex:2,
+    },
+    avatarContainer:{
+        flex:2
     },
     avatar:{
         zIndex: 1,
         borderRadius: 100,
         width: 105,
         height: 105,
-        marginLeft: -70,
-        top: 5
-    },
-    headerContent:{
-        flexDirection: "column",
-        width: 220,
-        paddingLeft: 20,
-        paddingVertical: 30,
-        paddingRight: 10
     },
     headerText:{
         fontSize: 22,
+        textAlign:"right",
         fontWeight: "bold",
-        color: "#95A8EF"
+        color: "#95A8EF",
+        width:"70%",
+        flex:4
     },
     content:{
         paddingHorizontal: 15,
