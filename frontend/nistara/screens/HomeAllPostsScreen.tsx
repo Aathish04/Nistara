@@ -121,13 +121,12 @@ const AllPostsScreen = ({navigation}: {navigation:any}) =>{
   const fetchPosts = useCallback(async () => {
     try {
       const response = await client.getPosts();
-      console.log(response.result)
       if(response.result){
         await sqliteClient.validateAddAndUpdatePosts(response.result, false)
       }
       const localPosts = await sqliteClient.getPosts()
-      if(localPosts.result){
-        setPosts(response.result)
+      if(localPosts){
+        setPosts(localPosts)
       }
     } catch (error) {
       console.error('Error fetching posts: ', error);
