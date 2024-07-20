@@ -128,6 +128,14 @@ const AllPostsScreen = ({navigation}: {navigation:any}) =>{
       if(localPosts){
         setPosts(localPosts)
       }
+
+      const requestsResponse = await client.getRequestPosts();
+      if(requestsResponse.result){
+        await sqliteClient.validateAddAndUpdateRequests(requestsResponse.result)
+      }
+      const localRequests = await sqliteClient.getRequests()
+      console.log(localRequests)
+
     } catch (error) {
       console.error('Error fetching posts: ', error);
     }

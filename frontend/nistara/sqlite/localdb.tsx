@@ -31,7 +31,7 @@ export interface Post {
 export interface Request {
     id: string;
     geolocation: [number, number];
-    ismatched: number;
+    ismatched: boolean;
     item: string;
     matcherid: number;
     postclass: string;
@@ -201,6 +201,128 @@ export class SQLiteClient{
 
     async clearPostsTable(){
         await this.db.execAsync(`DELETE FROM posts`);
+        await this.db.execAsync('VACUUM');
+        console.log("All rows deleted successfully");
+    }
+
+        // Add Request
+    async addRequest(request: Request) {
+        await this.db.runAsync(
+            `INSERT INTO ${TABLES.mainRequests} (id, geolocation, ismatched, item, matcherid, postclass, postid, profilephoto, quantity, timestamp, translatedtextcontent, umbrellatype, userid, username) VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                request.id,
+                JSON.stringify(request.geolocation),
+                request.ismatched ? 1 : 0,
+                request.item,
+                request.matcherid,
+                request.postclass,
+                request.postid,
+                request.profilephoto,
+                request.quantity,
+                request.timestamp,
+                request.translatedtextcontent,
+                request.umbrellatype,
+                request.userid,
+                request.username
+            ]
+        );
+        console.log("Added request successfully");
+    }
+
+    // Update Request
+    async updateRequest(request: Request) {
+        await this.db.runAsync(
+            `UPDATE ${TABLES.mainRequests} SET 
+            geolocation = ?, 
+            ismatched = ?, 
+            item = ?, 
+            matcherid = ?, 
+            postclass = ?, 
+            postid = ?, 
+            profilephoto = ?, 
+            quantity = ?, 
+            timestamp = ?, 
+            translatedtextcontent = ?, 
+            umbrellatype = ?, 
+            userid = ?, 
+            username = ? 
+            WHERE id = ?`,
+            [
+                JSON.stringify(request.geolocation),
+                request.ismatched ? 1 : 0,
+                request.item,
+                request.matcherid,
+                request.postclass,
+                request.postid,
+                request.profilephoto,
+                request.quantity,
+                request.timestamp,
+                request.translatedtextcontent,
+                request.umbrellatype,
+                request.userid,
+                request.username,
+                request.id
+            ]
+        );
+    }
+
+    // Get Requests
+    async getRequests(): Promise<Request[]> {
+        const allRequests = await this.db.getAllAsync(`SELECT * FROM ${TABLES.mainRequests}`);
+        let requests = allRequests.map((request: any) => {
+            let typedRequest: Request = {
+                id: request.id,
+                geolocation: JSON.parse(request.geolocation),
+                ismatched: request.ismatched == 1,
+                item: request.item,
+                matcherid: request.matcherid,
+                postclass: request.postclass,
+                postid: request.postid,
+                profilephoto: request.profilephoto,
+                quantity: request.quantity,
+                timestamp: request.timestamp,
+                translatedtextcontent: request.translatedtextcontent,
+                umbrellatype: request.umbrellatype,
+                userid: request.userid,
+                username: request.username
+            };
+            return typedRequest;
+        });
+        return requests;
+    }
+
+    // Validate and Add or Update Requests
+    async validateAddAndUpdateRequests(requests: Request[]) {
+        try {
+            const requestsLocal = await this.getRequests();
+            if (requestsLocal.length == 0) {
+                requests.map(async (request: Request) => {
+                    await this.addRequest(request);
+                });
+            } else {
+                const localRequestsMap = new Map(requestsLocal.map((request: Request) => [request.id, request]));
+
+                for (const request of requests) {
+                    const localRequest = localRequestsMap.get(request.id);
+
+                    if (!localRequest) {
+                        await this.addRequest(request);
+                    } else {
+                        if (localRequest.timestamp !== request.timestamp) {
+                            await this.updateRequest(request);
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    // Clear Requests Table
+    async clearRequestsTable() {
+        await this.db.execAsync(`DELETE FROM ${TABLES.mainRequests}`);
         await this.db.execAsync('VACUUM');
         console.log("All rows deleted successfully");
     }
