@@ -13,19 +13,36 @@ export interface Post {
     geolocation: [number, number];
     multimediaurl: string[];
     textcontent: string;
-    timestamp: number;
-    lastupdatetimestamp: number;
+    timestamp: string;
+    lastupdatetimestamp: string;
     userid: string;
     username: string;
     profilephoto: string;
     language: string;
     classifier: number;
     isclassified: boolean;
-    class: any;
+    class: string|null;
     translator:number;
     istranslated:boolean;
     translatedtextcontent:string|null
     mesh?:boolean;
+}
+
+export interface Request {
+    id: string;
+    geolocation: [number, number];
+    ismatched: number;
+    item: string;
+    matcherid: number;
+    postclass: string;
+    postid: string;
+    profilephoto: string;
+    quantity: number;
+    timestamp: number;
+    translatedtextcontent: string;
+    umbrellatype: string;
+    userid: string;
+    username: string;
 }
 
 export class SQLiteClient{
@@ -64,7 +81,7 @@ export class SQLiteClient{
         console.log("added post successfully")
     }
 
-    async writePost(userid: string, username: string, profilephoto:string, textcontent: string, multimediaurl: string[], timestamp: number, geoLocation: [number, number], language:string, mesh: boolean){
+    async writePost(userid: string, username: string, profilephoto:string, textcontent: string, multimediaurl: string[], timestamp: string, geoLocation: [number, number], language:string, mesh: boolean){
         let postid: string = sha256(String(userid) + textcontent + String(multimediaurl) + timestamp + String(geoLocation)).toString();
         let data: Post = {
             id: postid,
