@@ -50,6 +50,7 @@ const SplashScreen = ({ navigation }: { navigation: any }) => {
     <LinearGradient style={styles.container} colors={["#f1f3ff", "#95A8EF"]} locations={[0, 0.45]}>
       <Image
         source={require("../assets/splash/logo.jpg")}
+        style={styles.splashimage}
       />
       <View style={styles.textContainer}>
         <Text style={styles.title}>Welcome to Nistara</Text>
@@ -57,16 +58,18 @@ const SplashScreen = ({ navigation }: { navigation: any }) => {
           Empowering Communities, Saving Lives
         </Text>
       </View>
-      <TouchableOpacity style={styles.button}
-            onPress = {()=>{navigation.navigate("Auth", {screen: "OnboardingInit"})}}>
-            <Text style={styles.buttonText}>Learn how it works</Text>
-      </TouchableOpacity>
-      <View style={styles.loginContainer}>
-              <Text style={{ fontSize: 16, color:"#fff" }}>Already have an account? </Text>
-              <Pressable
-                  onPress={() => navigation.navigate("Auth", {screen: "Login"})}>
-                  <Text style={styles.loginText}>Log In</Text>
-              </Pressable>
+      <View style={styles.loginButtonandContainer}>
+        <TouchableOpacity style={styles.button}
+              onPress = {()=>{navigation.navigate("Auth", {screen: "OnboardingInit"})}}>
+              <Text style={styles.buttonText}>Learn how it works</Text>
+        </TouchableOpacity>
+        <View style={styles.loginContainer}>
+                <Text style={{ fontSize: 16, color:"#fff" }}>Already have an account? </Text>
+                <Pressable
+                    onPress={() => navigation.navigate("Auth", {screen: "Login"})}>
+                    <Text style={styles.loginText}>Log In</Text>
+                </Pressable>
+        </View>
       </View>
     </LinearGradient>
   );
@@ -75,32 +78,37 @@ const SplashScreen = ({ navigation }: { navigation: any }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    paddingHorizontal: 22,
+    alignItems: "center"
+    // paddingHorizontal: 22,
+  },
+  splashimage:{
+    flex :2,
+    width:"100%"
   },
   textContainer: {
-    width: "95%",
+    flex:1,
     alignItems: "center",
-    paddingBottom: 175,
-    paddingTop: 55
   },
   title: {
     fontSize: 32,
     fontWeight: "bold",
     color: "#fff",
     textAlign: "center",
-    paddingBottom: 7,
+    padding:"2%"
   },
   subtitle: {
     fontSize: 18,
     color: "#fff",
     textAlign: "center",
   },
+  loginButtonandContainer:{
+    flex:1,
+    alignItems:"center",
+    justifyContent:"space-around"
+  },
   button: {
-    paddingBottom: 14,
-    paddingVertical: 14,
     borderColor: '#FFFFFF',
-    borderWidth: 2,
+    padding:"5%",
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
@@ -114,13 +122,11 @@ const styles = StyleSheet.create({
   loginContainer:{
     flexDirection: "row",
     justifyContent: "center",
-    marginVertical: 20
   },
   loginText:{
     fontSize: 16,
     color: "#fff",
     fontWeight: "bold",
-    marginLeft: 6
   }
 });
 
