@@ -2,6 +2,17 @@ import axios from 'axios';
 import { sha256 } from 'js-sha256';
 import { Credential } from './env';
 
+
+
+export enum  TABLES{
+  mainPosts = "main.posts",
+  mainRequests = "main.requests",
+  mainDonations = "main.donations",
+  mainMatches = "main.matches",
+  mainUsers = "main.users"
+};
+
+
 interface User {
   userID: string,
   userName: string,
@@ -164,6 +175,24 @@ export class dbClient {
     }
   }
 
+  async getMatches() {
+    try {
+      let response = await axios.get(`${this.baseUrl}/matches/rows`, { headers: this.headers });
+      const matches = response.data.data.map((match:any)=>({
+        requestid :match.requestid,
+        donationid : match.donationid,
+        donorack : match.donorack,
+        matcherid : match.matcherid,
+        matchtime : match.matchtime,
+        requesterack : match.requesterack,
+      }))
+      return { message: 'Matches Fetch Successful', result: matches };
+    } catch (e) {
+      console.error('Failed fetching all Matches:', e);
+      return { message: 'Failed fetching all Matches', result: null };
+    }
+  }
+
   async getInformationPosts() {
     try {
       let response = await axios.get(`${this.baseUrl}/information/rows`, { headers: this.headers });
@@ -207,7 +236,7 @@ export class dbClient {
 
   async getUser(email: string, password: string){
     try{
-      const query: string= `SELECT * from main.users WHERE email = '${email}' ALLOW FILTERING;`
+      const query: string= `SELECT * from ${TABLES.mainUsers} WHERE email = '${email}' ALLOW FILTERING;`
       const headers = {
         'Content-Type': 'text/plain',
         'X-Cassandra-Token': ASTRA_DB_APPLICATION_TOKEN,
