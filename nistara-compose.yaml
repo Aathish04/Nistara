@@ -1,0 +1,23 @@
+version: "3"
+services:
+  matcher:
+    image: matcher:latest
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    environment:
+      - INSTANCEID=
+      - LLM_API_KEY=
+  classifier:
+    image: classifier:latest
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    environment:
+      - INSTANCEID=
+      - LLM_API_KEY=
+  translator:
+    image: translator:latest
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    environment:
+      - INSTANCEID=
+      - LLM_API_KEY=
