@@ -133,7 +133,7 @@ useFocusEffect(
                 </TouchableOpacity>
             )} */}
 
-            <TouchableOpacity style={styles.button} onPress={()=>{navigation.navigate("WritePost")}}>
+            <TouchableOpacity style={styles.button} onPress={()=>{navigation.navigate("WritePost", {message: null})}}>
       <Ionicons name="pencil" size={24} color="#fff" />
     </TouchableOpacity>
     </View>

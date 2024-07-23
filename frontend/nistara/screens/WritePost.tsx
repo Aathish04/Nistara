@@ -7,9 +7,8 @@ import { Ionicons } from '@expo/vector-icons'
 import SafeViewAndroid from '../components/SafeViewAndroid';
 import { useUser } from '../components/UserContext';
 import { images } from '../constants/Images';
-import { useRoute } from '@react-navigation/native';
 
-const WritePost = ({navigation}:{navigation: any}) => {
+const WritePost = ({navigation, route}:{navigation: any, route: any}) => {
 
   const [location, setLocation] = useState<Location.LocationObject>();
   const [errorMsg, setErrorMsg] = useState("");
@@ -17,6 +16,11 @@ const WritePost = ({navigation}:{navigation: any}) => {
   const [lat, setLat] = useState<number>(20.5937);
   const [long, setLong] = useState<number>(78.9629);
   
+
+  useEffect(()=>{
+    const { message } = route.params
+    if(message) setText(message)
+    }, [route])
   
   const database = new dbClient();
   const sqlClient = new SQLiteClient()
@@ -46,7 +50,7 @@ const WritePost = ({navigation}:{navigation: any}) => {
     let response;
     try{
       response = await database.addPost(userID, userName, profileImage, text, [] ,Date.now(), [lat,long], language)
-      await sqlClient.writePost(userID, userName, profileImage, text, [] ,Date.now(), [lat,long], language, false)
+      await sqlClient.writePost(userID, userName, profileImage, text, [] ,Date.now().toString(), [lat,long], language, false)
     }catch(e){
       if(response) setErrorMsg(response.message)
       console.error(e)

@@ -225,11 +225,7 @@ export class SQLiteClient{
     }     
     }
 
-    async clearPostsTable(){
-        await this.db.execAsync(`DELETE FROM posts`);
-        await this.db.execAsync('VACUUM');
-        console.log("All rows deleted successfully");
-    }
+    
 
         // Add Request
     async addRequest(request: Request) {
@@ -564,6 +560,119 @@ export class SQLiteClient{
         console.log("All rows deleted successfully");
     }
 
+    // Get Posts given userid
+    async getPostsWhereUserId(userid: string){
+        const userPosts = await this.db.getAllAsync(`SELECT * from ${TABLES.mainPosts} WHERE userid = ?`, [userid])
+        let posts = userPosts.map((post: any)=>{
+            let typedpost : Post = {
+                id: post.id,
+                geolocation: JSON.parse(post.geolocation),
+                multimediaurl: JSON.parse(post.multimediaurl),
+                textcontent: post.textcontent,
+                timestamp: post.timestamp,
+                lastupdatetimestamp: post.lastupdatetimestamp,
+                userid: post.userid,
+                username: post.username,
+                profilephoto: post.profilephoto,
+                language: post.language,
+                classifier: post.classifier,
+                isclassified: (post.isclassified==1)? true: false,
+                class: post.class,
+                translator: post.translator,
+                istranslated: (post.istranslated==1)? true: false,
+                translatedtextcontent: post.translatedtextcontent,
+                mesh:(post.mesh==1)?true:false
+            }
+            return typedpost
+        })
+        return posts
+    }
+
+    // Get Requests given userid
+    async getRequestsWhereUserId(userid: string){
+        const userRequests = await this.db.getAllAsync(`SELECT * from ${TABLES.mainRequests} WHERE userid = ?`, [userid])
+        let requests = userRequests.map((request: any) => {
+            let typedRequest: Request = {
+                id: request.id,
+                geolocation: JSON.parse(request.geolocation),
+                ismatched: request.ismatched == 1,
+                item: request.item,
+                matcherid: request.matcherid,
+                postclass: request.postclass,
+                postid: request.postid,
+                profilephoto: request.profilephoto,
+                quantity: request.quantity,
+                timestamp: request.timestamp,
+                translatedtextcontent: request.translatedtextcontent,
+                umbrellatype: request.umbrellatype,
+                userid: request.userid,
+                username: request.username
+            };
+            return typedRequest;
+        });
+        return requests;
+    }
+
+    async getPostsWherePostId(id: string){
+        const post : any = await this.db.getFirstAsync(`SELECT * from ${TABLES.mainPosts} WHERE id = ?`, [id])
+        let typedpost : Post = {
+            id: post.id,
+            geolocation: JSON.parse(post.geolocation),
+            multimediaurl: JSON.parse(post.multimediaurl),
+            textcontent: post.textcontent,
+            timestamp: post.timestamp,
+            lastupdatetimestamp: post.lastupdatetimestamp,
+            userid: post.userid,
+            username: post.username,
+            profilephoto: post.profilephoto,
+            language: post.language,
+            classifier: post.classifier,
+            isclassified: (post.isclassified==1)? true: false,
+            class: post.class,
+            translator: post.translator,
+            istranslated: (post.istranslated==1)? true: false,
+            translatedtextcontent: post.translatedtextcontent,
+            mesh:(post.mesh==1)?true:false
+        }
+        return typedpost
+    }
+
+    // Get Donations given userid
+    async getDonationsWhereUserId(userid: string){
+        const userDonations = await this.db.getAllAsync(`SELECT * from ${TABLES.mainDonations} WHERE userid = ?`, [userid])
+        let donations = userDonations.map((donation: any) => {
+            let typedDonation: Donation = {
+                id: donation.id,
+                geolocation: JSON.parse(donation.geolocation),
+                ismatched: donation.ismatched == 1,
+                item: donation.item,
+                matcherid: donation.matcherid,
+                postclass: donation.postclass,
+                postid: donation.postid,
+                profilephoto: donation.profilephoto,
+                quantity: donation.quantity,
+                timestamp: donation.timestamp,
+                translatedtextcontent: donation.translatedtextcontent,
+                umbrellatype: donation.umbrellatype,
+                userid: donation.userid,
+                username: donation.username
+            };
+            return typedDonation;
+        });
+        return donations;
+    }
+
+    // Get Request Items given postid
+    async getRequestItemsWherePostId(postid: string){
+        const postRequests = await this.db.getAllAsync(`SELECT * from ${TABLES.mainRequests} WHERE postid = ?`, [postid])
+        let requestItems: string[] = []
+        postRequests.map((request: any) => {
+            requestItems.push(request.item)
+        });
+        return requestItems;
+    }
+
+
 
     static async initDatabase(db: SQLite.SQLiteDatabase){
         await db.execAsync(`CREATE TABLE IF NOT EXISTS ${TABLES.mainPosts} (
@@ -630,5 +739,14 @@ export class SQLiteClient{
           PRIMARY KEY (requestid, donationid)
         )`)
     console.log("Tables created successfully")
+    }
+
+    async clearAllTables(){
+        await this.db.execAsync(`DELETE FROM ${TABLES.mainPosts}`);
+        await this.db.execAsync(`DELETE FROM ${TABLES.mainRequests}`);
+        await this.db.execAsync(`DELETE FROM ${TABLES.mainDonations}`);
+        await this.db.execAsync(`DELETE FROM ${TABLES.mainMatches}`)
+        await this.db.execAsync('VACUUM');
+        console.log("All tables cleared successfully");
     }
 }

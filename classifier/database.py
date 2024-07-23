@@ -132,7 +132,7 @@ def putExtractedInformation(extracted_info, post_data):
         combined_str = str({**post_data, **extracted_info}).encode()
         result = hashlib.sha256(combined_str)
         requestid = result.hexdigest()
-        session.execute(prepared, (requestid, None , postid, userid, None, None, None, geolocation, False, username, profilephoto, timestamp, textualinfo, UNSET_MATCHER_ID))
+        session.execute(prepared, (requestid, None , postid, userid, None, None, postclass, geolocation, False, username, profilephoto, timestamp, textualinfo, UNSET_MATCHER_ID))
         logger.info(f"Inserted search request: {requestid}")
 
     elif postclass == 'REQUEST_ITEM':
@@ -158,8 +158,6 @@ def putExtractedInformation(extracted_info, post_data):
     prepared_statement = session.prepare(update_query)
     session.execute(prepared_statement, (datetime.utcnow(), True, postclass, postid))
     logger.info(f"Updated post {postid} as classified with tag {postclass}")
-
-
 
 
 if __name__ == "__main__":
