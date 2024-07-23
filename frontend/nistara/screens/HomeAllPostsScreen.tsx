@@ -7,8 +7,6 @@ import { Ionicons, FontAwesome } from '@expo/vector-icons'
 
 import PostCard from '../components/PostCard';
 
-// import { posts } from '../sampledata/posts';
-
 const AllPostsScreen = ({navigation}: {navigation:any}) =>{
   const [posts, setPosts] = useState<any>([]);
   const [refreshing, setRefreshing] = useState(false);
