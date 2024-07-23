@@ -3,10 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from "@expo/vector-icons";
-import { Credential } from '../database/env';
+// import { Credential } from '../database/env';
 
-const cred = new Credential();
-const BING_MAPS_API_KEY: string = cred.BING_MAPS_API_KEY
+// const cred = new Credential();
+const BING_MAPS_API_KEY: string | undefined= process.env.EXPO_PUBLIC_BING_MAPS_API_KEY
 
 interface Alert {
   severity: string;
