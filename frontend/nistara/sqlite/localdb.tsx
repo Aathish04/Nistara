@@ -225,11 +225,7 @@ export class SQLiteClient{
     }     
     }
 
-    async clearPostsTable(){
-        await this.db.execAsync(`DELETE FROM posts`);
-        await this.db.execAsync('VACUUM');
-        console.log("All rows in posts table deleted successfully");
-    }
+    
 
         // Add Request
     async addRequest(request: Request) {
@@ -666,6 +662,16 @@ export class SQLiteClient{
         return donations;
     }
 
+    // Get Request Items given postid
+    async getRequestItemsWherePostId(postid: string){
+        const postRequests = await this.db.getAllAsync(`SELECT * from ${TABLES.mainRequests} WHERE postid = ?`, [postid])
+        let requestItems: string[] = []
+        postRequests.map((request: any) => {
+            requestItems.push(request.item)
+        });
+        return requestItems;
+    }
+
 
 
     static async initDatabase(db: SQLite.SQLiteDatabase){
@@ -733,5 +739,14 @@ export class SQLiteClient{
           PRIMARY KEY (requestid, donationid)
         )`)
     console.log("Tables created successfully")
+    }
+
+    async clearAllTables(){
+        await this.db.execAsync(`DELETE FROM ${TABLES.mainPosts}`);
+        await this.db.execAsync(`DELETE FROM ${TABLES.mainRequests}`);
+        await this.db.execAsync(`DELETE FROM ${TABLES.mainDonations}`);
+        await this.db.execAsync(`DELETE FROM ${TABLES.mainMatches}`)
+        await this.db.execAsync('VACUUM');
+        console.log("All tables cleared successfully");
     }
 }
