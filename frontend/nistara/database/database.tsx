@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { sha256 } from 'js-sha256';
-import { Credential } from './env';
+// import { Credential } from './env';
 
 
 
@@ -27,11 +27,16 @@ interface User {
   language: string
 }
 
-const cred = new Credential();
-const ASTRA_DB_ID :string = cred.ASTRA_DB_ID
-const ASTRA_DB_REGION : string = cred.ASTRA_DB_REGION
-const ASTRA_DB_KEYSPACE : string = cred.ASTRA_DB_KEYSPACE
-const ASTRA_DB_APPLICATION_TOKEN : string = cred.ASTRA_DB_APPLICATION_TOKEN
+// const cred = new Credential();
+// const ASTRA_DB_ID :string = cred.ASTRA_DB_ID
+// const ASTRA_DB_REGION : string = cred.ASTRA_DB_REGION
+// const ASTRA_DB_KEYSPACE : string = cred.ASTRA_DB_KEYSPACE
+// const ASTRA_DB_APPLICATION_TOKEN : string = cred.ASTRA_DB_APPLICATION_TOKEN
+
+const ASTRA_DB_ID : string | undefined = process.env.EXPO_PUBLIC_ASTRA_DB_ID
+const ASTRA_DB_REGION : string | undefined = process.env.EXPO_PUBLIC_ASTRA_DB_REGION
+const ASTRA_DB_KEYSPACE : string | undefined= process.env.EXPO_PUBLIC_ASTRA_DB_KEYSPACE
+const ASTRA_DB_APPLICATION_TOKEN : string | undefined = process.env.EXPO_PUBLIC_ASTRA_DB_APPLICATION_TOKEN
 
 const ASTRA_BASE_URL = `https://${ASTRA_DB_ID}-${ASTRA_DB_REGION}.apps.astra.datastax.com`;
 

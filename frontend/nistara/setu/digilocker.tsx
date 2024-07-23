@@ -1,10 +1,14 @@
 import axios from 'axios'
-import { Credential } from './env';
+// import { Credential } from './env';
 
-const cred = new Credential;
-const CLIENT_ID:string = cred.CLIENT_ID
-const CLIENT_SECRET:string = cred.CLIENT_SECRET
-const PRODUCT_INSTANCE_ID:string = cred.PRODUCT_INSTANCE_ID
+// const cred = new Credential;
+// const CLIENT_ID:string = cred.CLIENT_ID
+// const CLIENT_SECRET:string = cred.CLIENT_SECRET
+// const PRODUCT_INSTANCE_ID:string = cred.PRODUCT_INSTANCE_ID
+
+const CLIENT_ID:string | undefined = process.env.EXPO_PUBLIC_CLIENT_ID
+const CLIENT_SECRET:string | undefined= process.env.EXPO_PUBLIC_CLIENT_SECRET
+const PRODUCT_INSTANCE_ID:string | undefined = process.env.EXPO_PUBLIC_PRODUCT_INSTANCE_ID
 
 export class setuClient {
     baseUrl: string;
