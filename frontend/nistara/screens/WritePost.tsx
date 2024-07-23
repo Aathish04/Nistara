@@ -46,7 +46,7 @@ const WritePost = ({navigation}:{navigation: any}) => {
     let response;
     try{
       response = await database.addPost(userID, userName, profileImage, text, [] ,Date.now(), [lat,long], language)
-      await sqlClient.writePost(userID, userName, profileImage, text, [] ,Date.now(), [lat,long], language, false)
+      await sqlClient.writePost(userID, userName, profileImage, text, [] ,Date.now().toString(), [lat,long], language, false)
     }catch(e){
       if(response) setErrorMsg(response.message)
       console.error(e)
