@@ -138,3 +138,4 @@ compose.yaml
 .vscode
 
 build-*.aab
+secrets.json

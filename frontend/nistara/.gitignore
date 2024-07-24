@@ -36,9 +36,8 @@ yarn-error.*
 
 .gradle/
 .idea/
-env.tsx
 data.tsx
 NistaraDB-token.json
-env.tsx
+
 
 build-*.apk
