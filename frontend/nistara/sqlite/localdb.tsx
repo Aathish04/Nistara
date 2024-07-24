@@ -672,6 +672,41 @@ export class SQLiteClient{
         return requestItems;
     }
 
+    // Get Request - Suppy/ Demand Analytics
+    async getRequestCounts(){
+        const postclassQuery = `
+            SELECT postclass, COUNT(*) AS count, SUM(ismatched) AS matched_count
+            FROM ${TABLES.mainRequests}
+            GROUP BY postclass
+            `;
+
+        const umbrellatypeQuery = `
+            SELECT umbrellatype, COUNT(*) AS count, SUM(ismatched) AS matched_count
+            FROM ${TABLES.mainRequests}
+            GROUP BY umbrellatype
+          `;
+
+        const postclassRequests: any = await this.db.getAllAsync(postclassQuery);
+        const umbrellatypeRequests: any = await this.db.getAllAsync(umbrellatypeQuery)
+
+        const postclassData = postclassRequests.reduce((acc: { [x: string]: { count: any; matched_count: any; }; }, row: { postclass: string | number; count: any; matched_count: any; }) => {
+            acc[row.postclass] = {
+              count: row.count,
+              matched_count: row.matched_count
+            };
+            return acc;
+          }, {});
+      
+          const umbrellatypeData = umbrellatypeRequests.reduce((acc: { [x: string]: { count: any; matched_count: any; }; }, row: { umbrellatype: string | number; count: any; matched_count: any; }) => {
+            acc[row.umbrellatype] = {
+              count: row.count,
+              matched_count: row.matched_count
+            };
+            return acc;
+          }, {});
+
+          return {postclassData, umbrellatypeData}
+    }
 
 
     static async initDatabase(db: SQLite.SQLiteDatabase){
