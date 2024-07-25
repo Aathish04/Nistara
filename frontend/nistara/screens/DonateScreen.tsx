@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, ScrollView, SafeAreaView, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, View, ScrollView, SafeAreaView, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SQLiteClient } from '../sqlite/localdb';
 import * as Progress from 'react-native-progress';
 import { Ionicons } from '@expo/vector-icons';
 import SafeViewAndroid from '../components/SafeViewAndroid';
+import { fundraisers } from '../newsdata/fundraisers';
+
+
 
 // Define the color scheme
 const postclassColors: Record<any, string> = {
@@ -33,7 +36,7 @@ const displayClassText: Record<any, string> = {
     'TOOLS_AND_EQUIPMENT': 'Tools & Equipment'
 };
 
-const DonateScreen = () => {
+const DonateScreen = ({navigation}:{navigation: any}) => {
     const [postclassReqCounts, setPostClassReqCounts] = useState<any | null>(null);
     const [umbrellatypeReqCounts, setUmbrellaTypeReqCounts] = useState<any | null>(null);
     const [isItemCollapsed, setIsItemCollapsed] = useState<boolean>(true);
@@ -55,30 +58,75 @@ const DonateScreen = () => {
         setIsItemCollapsed(!isItemCollapsed);
     };
 
+    const handleWritePost = (items: string) =>{
+        const message = `I would like to donate ${items}`
+        navigation.navigate("WritePost", {message})
+        
+    }
+
+    const pluralOrSingular = (num: number) => {
+        const message = (num==1) ? "request" : "requests";
+        return message
+    }
+
     const renderProgressBars = (data: any, colorMap: any) => {
         return (
             <View>
                 {Object.keys(data).filter(key => key !== 'null').map((key) => (
-                    <View key={key} style={styles.progressContainer}>
-                        <Text style={styles.label}>{displayClassText[key]}</Text>
-                        <Progress.Bar
-                            progress={data[key].matched_count / data[key].count}
-                            width={300}
-                            color={colorMap[key] || 'gray'}
-                            style={styles.progressBar}
-                        />
-                        <Text style={styles.percentage}>{((data[key].matched_count / data[key].count) * 100).toFixed(1)}%</Text>
-                    </View>
+                    <TouchableOpacity onPress = {()=>{handleWritePost(displayClassText[key])}}>
+                        <View key={key} style={styles.progressContainer}>
+                            <Text style={styles.label}>{displayClassText[key]}</Text>
+                            <Progress.Bar
+                                progress={data[key].matched_count / data[key].count}
+                                color={colorMap[key] || '#ccc'}
+                                // style={styles.progressBar}
+                            />
+                            <View style={{flexDirection: "column", paddingLeft: 10}}>
+                                <Text style={{...styles.percentage, flexWrap: "wrap", width: 90}}>Fulfilled {(data[key].matched_count)} {pluralOrSingular(data[key].matched_count)}</Text>
+                                <Text style={styles.percentage}>out of {data[key].count}</Text>
+                            </View>
+                        </View>
+                    </TouchableOpacity>
                 ))}
             </View>
         );
     };
 
+    const FundraiserCard = ({fundraiser}: {fundraiser: any}) =>{
+        console.log(fundraiser)
+        return(
+            <View key = {fundraiser.id} style={styles.card}>
+                <View key = {fundraiser.id} style={styles.cardHeader}>
+                    <Image source={{uri: fundraiser.profilePhoto}} style={styles.profilePhoto} />
+                    <View style={styles.postDetails}>
+                        <Text style={styles.userName}>{fundraiser.issuedBy}</Text>
+                        <Text style={{}}>{fundraiser.issuedByDesc}</Text>
+                        <Text style={styles.timeOfPost}>{fundraiser.timeOfIssue}</Text>
+                    </View>
+                </View>
+                    <Text style={styles.textContent}>
+                        {fundraiser.textcontent}
+                    </Text>
+                    <View style={{flexDirection: "row", justifyContent: "space-between", paddingTop: 10}}>
+                        <Text>Goal: {fundraiser.goal}</Text>
+                        <Text>{fundraiser.raised}</Text>
+                    </View>
+                    <TouchableOpacity
+                        style={{
+                            ...styles.button,
+                            ...{ backgroundColor: '#95A8EF'} }}
+                        >
+                        <Text style={{ fontSize: 16, ... { color: '#FFFFFF' } }}>Donate</Text>
+                    </TouchableOpacity>
+                </View>  
+        )
+    }
+
     return (
             <View style={styles.container}>
-                 <Text style={styles.headerText}>Get involved by understanding the demand for requests and services, and join us in creating or supporting fundraisers.</Text>
+                 {/* <Text style={styles.headerText}>Get involved by understanding the demand for requests and services, and join us in creating or supporting fundraisers.</Text> */}
             <ScrollView style={{flex:1}}>
-                <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                <View style={{flexDirection: "row", justifyContent: "space-between", paddingTop: 20}}>
                     <Text style = {styles.analyticsHeaderText}>Request Analytics</Text>
                     <TouchableOpacity onPress={()=>setAnalyticsCollapsed(!isAnalyticsCollapsed)}>
                         <Ionicons name="chevron-down" size={24} color="#A9A9A9" />
@@ -94,13 +142,13 @@ const DonateScreen = () => {
                                     <Text style={[styles.label, { color: '#000', fontWeight: "condensed" }]}>{displayClassText[key]}</Text>
                                     <Progress.Bar
                                         progress={postclassReqCounts[key].matched_count / postclassReqCounts[key].count}
-                                        width={300}
-                                        // height={10}
                                         color={postclassColors[key] || 'gray'}
-                                        style={styles.progressBar}
                                     />
-                                    <Text style={styles.percentage}>{((postclassReqCounts[key].matched_count / postclassReqCounts[key].count) * 100).toFixed(1)}%</Text>
-                                </View>
+                                    <View style={{flexDirection: "column", paddingLeft: 10}}>
+                                        <Text style={{...styles.percentage, flexWrap: "wrap", width: 90}}>Fulfilled {(postclassReqCounts[key].matched_count)} {pluralOrSingular(postclassReqCounts[key].matched_count)}</Text>
+                                        <Text style={styles.percentage}>out of {postclassReqCounts[key].count}</Text>
+                                    </View>
+                            </View>
                             </TouchableOpacity>
                             {!isItemCollapsed && (
                                 <View style={styles.accordionContent}>
@@ -113,16 +161,31 @@ const DonateScreen = () => {
                             <Text style={[styles.label, {  color: '#000', fontWeight: "condensed"  }]}>{displayClassText[key]}</Text>
                             <Progress.Bar
                                 progress={postclassReqCounts[key].matched_count / postclassReqCounts[key].count}
-                                // height={10}
                                 color={postclassColors[key] || 'gray'}
-                                style={styles.progressBar}
                             />
-                            <Text style={styles.percentage}>{((postclassReqCounts[key].matched_count / postclassReqCounts[key].count) * 100).toFixed(1)}%</Text>
+                            <View style={{flexDirection: "column", paddingLeft: 10}}>
+                                <Text style={{...styles.percentage, flexWrap: "wrap", width: 90}}>Fulfilled {(postclassReqCounts[key].matched_count)} {pluralOrSingular(postclassReqCounts[key].matched_count)}</Text>
+                                <Text style={styles.percentage}>out of {postclassReqCounts[key].count}</Text>
+                            </View>
                         </View>
                     )
                 ))}
                 </View>
                 }
+                <Text style = {styles.analyticsHeaderText}>Fundraisers</Text>
+                <View style={styles.fundraisers}>
+                { fundraisers && 
+                    fundraisers.map((fundraiser: any, index: number)=>(
+                        <View>
+                            <FundraiserCard fundraiser={fundraiser} />
+                            <View style={{
+                                borderWidth: 0.2,
+                                borderColor: "#bbb",
+                            }}/>
+                        </View>
+                    ))
+                }
+                </View>
             </ScrollView>
             </View>
     );
@@ -158,9 +221,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         flexWrap: "wrap"
     },
-    progressBar: {
-        flex: 1,
-    },
     percentage: {
         marginLeft: 8,
         fontSize: 14,
@@ -182,6 +242,52 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         paddingBottom: 10,
         color: "#A9A9A9"
+    },
+    card:{
+        padding: 5,
+        backgroundColor: '#fff',
+        paddingVertical: 20
+    
+      },
+    cardHeader:{
+        flexDirection: "row",
+        justifyContent: 'space-between'
+    },
+    profilePhoto:{
+        height: 33,
+        width: 33,
+        marginRight: 20,
+        top: 10
+    },
+    postDetails:{
+        flexDirection: "column",
+        flex: 1
+    },
+    userName:{
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    timeOfPost:{
+        color: '#888',
+        fontSize: 12,
+        marginTop: 2
+    },
+    textContent:{
+        marginTop: 20,
+        fontSize: 14
+    },
+    fundraisers:{
+        paddingTop: 10
+    },
+    button:{
+        paddingVertical: 7,
+        borderColor: '#95A8EF',
+        borderWidth: 2,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: "40%",
+        marginTop: 10
     }
 });
 

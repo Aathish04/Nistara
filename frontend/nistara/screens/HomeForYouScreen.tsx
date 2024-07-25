@@ -7,9 +7,10 @@ const ForYouScreen = ({navigation}: {navigation: any}) => {
     const sqliteClient = new SQLiteClient()
     const deleteAllTables = async() =>{
         // await sqliteClient.clearAllTables()
-        const {postclassData, umbrellatypeData} = await sqliteClient.getRequestCounts()
-        console.log(postclassData)
-        console.log(umbrellatypeData)
+        // const {postclassData, umbrellatypeData} = await sqliteClient.getRequestCounts()
+        // console.log(postclassData)
+        // console.log(umbrellatypeData)
+        await sqliteClient.searchPosts("food")
     }
     return (
 

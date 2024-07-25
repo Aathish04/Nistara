@@ -708,6 +708,12 @@ export class SQLiteClient{
           return {postclassData, umbrellatypeData}
     }
 
+    async searchPosts(searchQuery: string){
+        const requiredPosts: any| null = await this.db.getAllAsync(`SELECT * from ${TABLES.mainPosts} where translatedtextcontent LIKE ?`, [`%${searchQuery}%`])
+        if(requiredPosts && requiredPosts.length>0) return requiredPosts
+        else return null
+    }
+
 
     static async initDatabase(db: SQLite.SQLiteDatabase){
         await db.execAsync(`CREATE TABLE IF NOT EXISTS ${TABLES.mainPosts} (

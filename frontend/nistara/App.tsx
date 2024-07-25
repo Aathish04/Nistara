@@ -5,7 +5,9 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons,SimpleLineIcons } from "@expo/vector-icons";
-import { TouchableOpacity, StyleSheet,Text, View, Image, Alert, Button} from 'react-native';
+import { TouchableOpacity, StyleSheet,Text, View, Image, Alert, Button, SafeAreaView} from 'react-native';
+
+import SafeViewAndroid from './components/SafeViewAndroid';
 
 // get currently logged in user details
 import { UserProvider } from './components/UserContext';
@@ -72,9 +74,9 @@ function HomeTabs({navigation}:{navigation:any}){
 
 
   return(
-  <>
+  <SafeAreaView style={SafeViewAndroid.AndroidSafeArea}>
       <View style={{
-        paddingTop: 60,
+        paddingTop: 5,
         paddingBottom: 15,
         paddingHorizontal: 18,
         flexDirection: "row",
@@ -160,7 +162,7 @@ function HomeTabs({navigation}:{navigation:any}){
   >
         <Text style={{ color: 'white', fontSize: 16, fontWeight: '400' }}>SOS</Text>
   </TouchableOpacity>
-  </>
+  </SafeAreaView>
   )
 }
 
