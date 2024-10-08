@@ -143,7 +143,7 @@ export class SQLiteClient{
             translator = ?,
             istranslated = ?,
             translatedtextcontent = ?
-            WHERE postid = ?`,
+            WHERE id = ?`,
             [
                 post.lastupdatetimestamp,
                 post.classifier,
@@ -215,6 +215,7 @@ export class SQLiteClient{
                 }else{
                     // post is present in local, see if it is updated
                     if(localPost.lastupdatetimestamp !== post.lastupdatetimestamp){
+                        console.log("Hello world", localPost, post)
                         await this.updatePost(post) // if updated, update in local as well
                     }
                 }
