@@ -44,7 +44,6 @@ import YourProfileScreen from './screens/YourProfileScreen';
 // sqlite --local store
 import { SQLiteProvider } from 'expo-sqlite';
 import { SQLiteClient } from './sqlite/localdb';
-import { MeshProvider } from './mesh/MeshContext';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -175,31 +174,6 @@ export default function App() {
     setPerms(JSON.stringify(await requestPermissionsAsync()))
   }
 
-  addOnEndpointConnectedListener(
-  (event) => {
-    console.log("Endpoint Found:" + JSON.stringify(event));
-    let oldConns = [...conns];
-    oldConns.push(event.endpointId)
-    oldConns = [...new Set(oldConns)];
-    setConns(oldConns)
-  });
-
-  addOnEndpointLostListener(
-    (event)=>{
-      console.log("Endpoint Lost: "+JSON.stringify(event))
-      let oldConns = new Set(conns)
-      oldConns.delete(event.endpointId);
-      setConns([...oldConns]);
-    }
-  )
-
-  addonPayloadReceivedListener(
-    (event)=>{
-      console.log(event)
-      Alert.alert(`Got Message: ${Buffer.from(event.payload, 'base64').toString('utf-8')}!`)
-    }
-  )
-
   function sendData(){
     Alert.alert("Send Payload","Send Payload",[
       {
@@ -217,7 +191,6 @@ export default function App() {
 
   let actualview = (
   <SQLiteProvider databaseName='nistara.db' onInit={SQLiteClient.initDatabase}>
-    <MeshProvider>
     <UserProvider>
       <NavigationContainer>
         <Stack.Navigator>
@@ -254,7 +227,6 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
-    </MeshProvider>
     </SQLiteProvider>
   );
   let meshtestview = (

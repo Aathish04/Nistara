@@ -1,5 +1,5 @@
 import torch
-from IndicTransTokenizer import IndicProcessor
+from IndicTransToolkit import IndicProcessor
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from logging import getLogger, basicConfig, INFO
 from dotenv import load_dotenv

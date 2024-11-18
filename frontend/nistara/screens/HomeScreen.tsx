@@ -10,8 +10,6 @@ const Tab = createMaterialTopTabNavigator();
 import AllPostsScreen from './HomeAllPostsScreen';
 import ForYouScreen from './HomeForYouScreen';
 import { useFocusEffect } from '@react-navigation/native';
-import { startAdvertising, startDiscovery, sanitycheck,requestPermissionsAsync, addOnEndpointConnectedListener, addOnEndpointLostListener, addonPayloadReceivedListener, sendPayload} from '../modules/nearby-connections-expo';
-import { MeshContext } from '../mesh/MeshContext';
 const HomeTopTabs = () =>{
    
     return(
@@ -60,63 +58,6 @@ const HomeScreen = ({navigation}: {navigation:any}) =>{
 //       setShowWelcomeMessage(!showWelcomeMessage);
 //   };
 
-    const context = useContext(MeshContext);
-
-    if (!context) {
-    throw new Error('HomeScreen must be used within a MeshProvider!');
-    }
-
-    const { conns, setConns } = context;
-
-    addOnEndpointConnectedListener(
-    (event) => {
-      console.log("Endpoint Found:" + JSON.stringify(event));
-      let oldConns = [...conns];
-      oldConns.push(event.endpointId)
-      oldConns = [...new Set(oldConns)];
-      setConns(oldConns)
-    });
-  
-    addOnEndpointLostListener(
-      (event)=>{
-        console.log("Endpoint Lost: "+JSON.stringify(event))
-        let oldConns = new Set(conns)
-        oldConns.delete(event.endpointId);
-        setConns([...oldConns]);
-      }
-    )
-  
-    addonPayloadReceivedListener(
-      (event)=>{
-        console.log(event)
-        Alert.alert(`Got Message: ${Buffer.from(event.payload, 'base64').toString('utf-8')}!`)
-      }
-    )
-
-    
-useFocusEffect(
-    React.useCallback(() => {
-        const startMesh = async () => {
-            try {
-                const permissions = await requestPermissionsAsync();
-                let allperms = true
-                for (let perm in permissions){
-                    if (permissions[perm].granted!=true){
-                        allperms = false
-                        Alert.alert("Warning!",`You won't be able to use our Mesh network without the ${perm} permission!`);
-                    }
-                }
-                if (allperms){
-                    console.log(`StartAdvertising: ${await startAdvertising()}`)
-                    console.log(`StartDiscovery: ${await startDiscovery()}`)
-                }
-            } catch (e) {
-              // Handle error
-            }
-          };
-        startMesh();
-    }, [])
-  );
 
 
     return(

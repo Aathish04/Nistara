@@ -11,6 +11,16 @@
       "distribution": "internal",
       "android":{
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_ASTRA_DB_ID":"b36272a9-7bb3-4857-8c51-95619aca3b1e",
+        "EXPO_PUBLIC_ASTRA_DB_REGION":"asia-south1",
+        "EXPO_PUBLIC_ASTRA_DB_KEYSPACE":"main",
+        "EXPO_PUBLIC_ASTRA_DB_APPLICATION_TOKEN":"AstraCS:mKuQTvEBmKWtMitQtCxxNCgB:fa57285d30c3363395ba1360568b074c50cf52a00ffdd5f31a1b7b31f6f35b1e",
+        "EXPO_PUBLIC_BING_MAPS_API_KEY":"Ah6eXyl7X7VIoVMSMT8IYkx03udleg2D7LqOpLkgto935lQEcZC8D9-zEZqjRTDh",
+        "EXPO_PUBLIC_CLIENT_ID":"f75fc694-4fed-46b8-81d8-bc651fb1effa",
+        "EXPO_PUBLIC_CLIENT_SECRET":"wfO8OEGdmLv7Fi63otCwrINRh87kJhP4",
+        "EXPO_PUBLIC_PRODUCT_INSTANCE_ID":"969b3cd2-26e5-498f-b9a6-d8f8b8c1ef66"
       }
     },
     "production": {}
